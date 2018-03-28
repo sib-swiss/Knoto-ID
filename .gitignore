@@ -1,0 +1,7 @@
+/build*/
+/bin/
+
+#for emacs
+*~
+*#
+.#*

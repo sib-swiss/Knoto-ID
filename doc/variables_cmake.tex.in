@@ -1,0 +1,4 @@
+%set by cmake
+\def\cmakeversion{@KNOTOID_VERSION_MAJOR@.@KNOTOID_VERSION_MINOR@.@KNOTOID_VERSION_PATCH@}
+\def\cmakefigurepath{"@LATEX_FIGURES_DIR@"}
+\def\cmakesrcpath{"@LATEX_SRC_DIR@"}

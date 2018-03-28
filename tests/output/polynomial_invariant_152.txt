@@ -1,0 +1,2 @@
+Polynomial:  + A^(4) + A^(12) - A^(16)
+Polynomial:  + 1

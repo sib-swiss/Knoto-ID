@@ -1,0 +1,2 @@
+#index_first	index_last	length	frequency	knot_type	polynomial
+0	1	2	1	0_1	 + 1

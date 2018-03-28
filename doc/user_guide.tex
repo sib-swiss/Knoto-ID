@@ -1,0 +1,266 @@
+% Copyright (C) 2017 by SIB Swiss Institute of Bioinformatics, Julien Dorier and Dimos Goundaroulis.
+% 
+% This file is part of project Knoto-ID.
+% 
+% Knoto-ID is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 2 of the License, or
+% (at your option) any later version.
+% 
+% Knoto-ID is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+% 
+% You should have received a copy of the GNU General Public License
+% along with Knoto-ID.  If not, see <http://www.gnu.org/licenses/>.
+
+\documentclass[a4paper,10pt]{article}
+
+\usepackage[margin=2cm]{geometry}
+
+\usepackage{xcolor}
+\definecolor{lightgrey}{rgb}{0.9,0.9,0.9}
+\definecolor{lightergrey}{rgb}{0.97,0.97,0.97}
+
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{bm}
+
+%%fonts
+\usepackage{lmodern} %font type I (vectoriel)
+
+\renewcommand*{\familydefault}{\sfdefault} 
+
+\usepackage[nosort]{cite}
+\usepackage[colorlinks=true,urlcolor=blue,linkcolor=black]{hyperref} 
+
+
+\input{variables_cmake.tex}
+\graphicspath{\cmakefigurepath}
+
+
+\renewcommand{\labelitemii}{$\circ$}
+
+\usepackage[bf]{caption}
+\setlength{\captionmargin}{10mm}
+
+
+
+
+\usepackage[protrusion=false]{microtype} %protrusion=false, to avoid problem of alignment in ttfamily when line start with "-"
+\DisableLigatures{family=tt*} %%to avoid -- replaced by en-dash in ttfamily
+
+\usepackage{verbatim}
+\usepackage{adjustbox}
+\newenvironment{lstlisting}%
+               {\par\noindent\adjustbox{margin=1ex,bgcolor=lightgrey,margin=0ex \medskipamount}\bgroup\minipage\linewidth\small\ttfamily\verbatim}%
+               {\endverbatim\endminipage\egroup\\}
+               
+\newenvironment{lstlistingsmall}%
+               {\par\noindent\adjustbox{margin=1ex,bgcolor=lightgrey,margin=0ex \medskipamount}\bgroup\minipage\linewidth\footnotesize\ttfamily\verbatim}%
+   {\endverbatim\endminipage\egroup\\}
+   
+\newenvironment{lstlistingverysmall}%
+               {\par\noindent\adjustbox{margin=1ex,bgcolor=lightgrey,margin=0ex \medskipamount}\bgroup\minipage\linewidth\scriptsize\ttfamily\verbatim}%
+               {\endverbatim\endminipage\egroup\\}
+                  
+                  
+\newcommand{\lstinline}[1]{{\colorbox{lightergrey}{\ttfamily\detokenize{#1}}}} %with colorbox => does not break lines
+\newcommand{\lstinlineT}[1]{{\colorbox{lightergrey}{\ttfamily #1}}} %with colorbox => does not break lines
+
+\usepackage{tikz}
+\usepackage{subfig}
+\usepackage{amsfonts}
+\usepackage{mathtools}
+
+\setlength{\parindent}{0mm} 
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{4}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+%%%%%% title %%%%%%%%%
+\begin{titlepage}
+  \begin{center}
+\vspace*{30mm}
+ {\Huge \bf Knoto-ID}\\
+\vspace*{5mm}
+\LARGE{Topological invariants of open curves\\
+  using the concept of knotoids}\\
+\vspace*{20mm}
+\LARGE{\bf User guide}\\
+\vspace*{5mm}
+\normalsize Version \cmakeversion \ (\today)\\
+\vspace*{10mm}
+Julien Dorier$^{1,3}$, Dimos Goundaroulis$^{2,3}$\\
+\vspace*{5mm}
+\small
+$^1$ Vital-IT, SIB Swiss Institute of Bioinformatics, Switzerland.\\
+$^2$ SIB Swiss Institute of Bioinformatics, Switzerland.\\
+$^3$ Center for Integrative Genomics, University of Lausanne, Switzerland.\\
+\end{center}
+\end{titlepage}
+\newpage
+
+\tableofcontents
+\newpage
+
+
+\section{Introduction}
+The backbone of most proteins forms an open curve.  To study their
+entanglement, a common strategy consists in searching for the presence
+of knots in their backbones using topological invariants.  However,
+this approach requires to close the curve into a loop, which alters
+the geometry of curve.  {\it Knoto-ID} allows evaluating the
+entanglement of open curves without the need to close them, using the
+recent concept of knotoids\cite{turaev,guka} which is a generalization
+of classical knot theory to open curves.  {\it Knoto-ID} can analyse
+the global topology of the full chain as well as the local topology by
+exhaustively studying all subchains or only determining the knotted
+core.  The use of {\it Knoto-ID} is not limited to proteins, it can be
+used to analyse any open curve in 3D space such as chromosomes,
+synthetic polymers, random walks, etc.
+
+{\it Knoto-ID} is a collection of command line tools with three executables (\lstinline{polynomial_invariant}, \lstinline{knotted_core} and  \lstinline{convert_diagram}) and five helper scripts (\lstinline{pdb_to_xyz.R}, \lstinline{plot_3D_curve.R}, \lstinline{plot_projection_map.R}, \lstinline{plot_knotted_core.R} and \lstinline{plot_diagram.R}):
+\begin{itemize}
+\item \lstinline{polynomial_invariant} computes the following polynomial invariants: classical Jones polynomial for knots (closed curves), Jones polynomial for knotoids (open curves projected on a sphere) and Turaev loop bracket for knotoids (open curves projected on a plane). \lstinline{polynomial_invariant} can output lists of polynomials obtained with multiple projection directions, which can be used to generate projection maps similar to those presented in\cite{gound}. A simple helper script \lstinline{plot_projection_map.R} is included with {\it Knoto-ID} to create such projection maps using the output of \lstinline{polynomial_invariant}.
+\item \lstinline{knotted_core} computes the knotted core of an open or closed curve. It can also be used to evaluate the dominant invariant polynomials for all subchains of the input curve. This data can be used to generate fingerprint matrices\cite{yeates, sulkowska2012, gound} (for open curves) or disk matrices\cite{rawdon} (for closed curves). A simple script \lstinline{plot_knotted_core.R} is included with {\it Knoto-ID} to create such fingerprint or disk matrices using the output produced by \lstinline{knotted_core}.
+\item \lstinline{convert_diagram} convert diagrams from/to PD codes, extended Gauss codes and piecewise linear curve (xyz). In particular, the xyz output format can be used to draw the diagram with the helper script \lstinline{plot_diagram.R} which is included with {\it Knoto-ID}.
+\item \lstinline{pdb_to_xyz.R} is a simple helper script to convert the backbone of proteins given in pdb format\cite{pdb} to piecewise linear curves in xyz format that can be used as input by {\it Knoto-ID}.
+\item \lstinline{plot_3D_curve.R} is a simple helper script to convert piecewise linear curves from xyz format to webGL format\cite{webgl} that can then be viewed interactively in compatible web browsers.
+\end{itemize}
+This document starts with a tutorial (section ``\ref{sec:tutorial} \nameref{sec:tutorial}'') where examples of use cases are shown. More details on the executables and their arguments, as well as a description of the file formats are given in section ``\ref{sec:reference} \nameref{sec:reference}''.  Mathematical concepts, definitions and choices of conventions are given in section ``\ref{sec:theory} \nameref{sec:theory}''.
+
+\subsection{Credit}
+If you use this software for a publication, please cite:\\
+J. Dorier, D. Goundaroulis, F. Benedetti and A. Stasiak, "Knoto-ID: a tool to study the entanglement of open protein chains using the concept of knotoids", submitted (2018).
+
+
+\subsection{Installation}
+Decompress Knoto-ID:
+\begin{lstlisting}
+$ tar -xf Knoto-ID-<version>.tar.gz 
+\end{lstlisting}
+Go in the Knoto-ID directory
+\begin{lstlisting}
+$ cd Knoto-ID-<version>/ 
+\end{lstlisting}
+
+{\it Knoto-ID} is organized into four directories:
+\begin{itemize}
+\item \lstinline{bin/}: executables \lstinline{polynomial_invariant}, \lstinline{knotted_core} and  \lstinline{convert_diagram}.
+\item \lstinline{scripts/}: scripts  \lstinline{plot_projection_map.R}, \lstinline{plot_knotted_core.R} and  \lstinline{plot_diagram.R}.
+\item \lstinline{doc/}: documentation (this document). 
+\item \lstinline{examples/}: input files used in this document.
+\end{itemize}
+
+To use the scripts \lstinline{pdb_to_xyz.R}, \lstinline{plot_3D_curve.R}, \lstinline{plot_projection_map.R}, \lstinline{plot_knotted_core.R} and  \lstinline{plot_diagram.R}, {\ttfamily R} (version>=3.1)\cite{r2017} must be installed along  with the following packages
+\begin{itemize}
+\item {\ttfamily optparse}\cite{optparse}.
+\item {\ttfamily ggplot2} (version>=2.2.0)\cite{wickham2009}.
+\item {\ttfamily RColorBrewer}\cite{rcolorbrewer}.
+\item {\ttfamily reshape2}\cite{reshape2}.
+\item {\ttfamily geometry}\cite{geometry}.
+\item {\ttfamily geosphere}\cite{geosphere}.
+\item {\ttfamily rgl}\cite{rgl} (only required for \lstinline{plot_projection_map.R} with option \lstinline{--output-3D} and \lstinline{plot_3D_curve.R}).
+\item {\ttfamily rmarkdown}\cite{rmarkdown} (only required for \lstinline{plot_projection_map.R} with option \lstinline{--output-3D} and \lstinline{plot_3D_curve.R}).
+\item {\ttfamily Rpdb}\cite{rpdb} (only required for \lstinline{pdb_to_xyz.R}).
+\end{itemize}
+These package can installed by entering the following command in {\ttfamily R}
+\begin{lstlisting}
+ install.packages(c("optparse","ggplot2","RColorBrewer","reshape2",
+                    "geometry","geosphere","rgl","rmarkdown","Rpdb"))
+\end{lstlisting}
+
+In addition, to use the webGL output format (\lstinline{plot_projection_map.R} with option \lstinline{--output-3D} and\\
+\lstinline{plot_3D_curve.R}), {\ttfamily pandoc}\cite{pandoc} must also be installed. 
+
+\paragraph{Tested configurations:}
+\begin{itemize}
+\item Mac OS X 10.12.6: R~3.3.2, optparse~1.4.4, ggplot2~2.2.1, RColorBrewer~1.1-2, reshape2~1.4.2, geometry~0.3-6, geosphere~1.5-7, rgl~0.98.1, rmarkdown~1.9, Rpdb~2.3, pandoc~2.1.1.
+\item Mac OS X 10.13.3: R~3.4.3, optparse~1.4.4, ggplot2~2.2.1, RColorBrewer~1.1-2, reshape2~1.4.3, geometry~0.3-6, geosphere~1.5-7, rgl~0.99.9, rmarkdown~1.8, Rpdb~2.3, pandoc~1.12.4.2.
+\item Ubuntu 16.04.3 LTS: R~3.2.3, optparse~1.4.4, ggplot2~2.2.1, RColorBrewer~1.1-2, reshape2~1.4.3, geometry~0.3-6, geosphere~1.5-7, rgl~0.99.9, Rpdb~2.3, pandoc~1.16.0.2.
+\item Fedora 25: R~3.4.2, optparse~1.4.4, ggplot2~2.2.1, RColorBrewer~1.1-2, reshape2~1.4.3, geometry~0.3-6, geosphere~1.5-7, rgl~0.99.9, rmarkdown~1.8, Rpdb~2.3, pandoc~1.17.0.3.
+\item Windows 10: R~3.4.3, optparse~1.4.4, ggplot2~2.2.1, RColorBrewer~1.1-2, reshape2~1.4.3, geometry~0.3-6, geosphere~1.5-8, rgl~0.99.9, rmarkdown~1.9, Rpdb~2.3, pandoc~2.1.2.
+\end{itemize}
+
+\subsection{Windows users}
+This user guide was written for Linux and Mac OS X users. However, {\it Knoto-ID} can also be run on Windows using the {\it Windows PowerShell} (preferred) or the  {\it Windows Command Prompt}. If you use {\it Knoto-ID} on Windows, please read the following comments: 
+\begin{itemize}
+\item {\bf {\ttfamily pandoc} installation.} {\ttfamily pandoc} should not only be available on the command line (e.g. \lstinline{pandoc --version} should return information on the installed version) but also be found by {\ttfamily R}. To check if {\ttfamily R} can find {\ttfamily pandoc}, start  {\ttfamily R} and type
+\begin{lstlisting}
+library(rmarkdown)
+pandoc_available()    
+\end{lstlisting}
+It should return \lstinline{TRUE}. When testing {\it Knoto-ID} on Windows 10, we noticed that {\ttfamily R} was able to find {\ttfamily pandoc} only when {\ttfamily pandoc} was installed for all users.
+\item {\bf Line continuation symbol.} In this document, we use the symbol \lstinlineT{\textbackslash} to break lines of code that should be entered as a single line. This symbol is properly interpreted in Linux and Mac OS X, but not in Windows. Windows users should not type this symbol but should manually concatenate consecutive lines separated by \lstinlineT{\textbackslash}. For example:
+\begin{lstlisting}
+$ bin/polynomial_invariant --projection="1,0,0" \
+  examples/3_1R.xyz
+\end{lstlisting}
+should be entered as     
+\begin{lstlisting}
+$ bin/polynomial_invariant --projection="1,0,0" examples/3_1R.xyz
+\end{lstlisting}
+\item{\bf {\ttfamily R} scripts.} On Windows, {\ttfamily R} scripts cannot be executed directly but must be passed as an argument to the {\ttfamily Rscript} executable distributed with {\ttfamily R}. If it is not on the path, first locate the {\ttfamily Rscript} executable. For example:
+\begin{lstlisting}
+C:\Program Files\R\R-3.4.3\bin\x64\Rscript.exe
+\end{lstlisting}
+To run examples using {\ttfamily R} scripts in this document, insert the full path to {\ttfamily Rscript} at the beginning of the line. For example, to run 
+\begin{lstlisting}
+$ scripts/plot_diagram.R --output=out.pdf diagram.xyz
+\end{lstlisting}
+type
+\begin{lstlisting}
+$ C:\'Program Files\R\R-3.4.3\bin\Rscript.exe' scripts/plot_diagram.R --output=out.pdf diagram.xyz
+\end{lstlisting}
+Please note that if the path contains space characters, as in this example, it must be enclosed between quotes.
+\item {\bf Paths.} In Windows, paths are written using backslashes \lstinlineT{\textbackslash}, while Linux and Mac OS X (and this document) use forward slashes  \lstinline{/}. For example, for Linux and Mac OS X
+\begin{lstlisting}
+$ bin/polynomial_invariant --projection="1,0,0" examples/3_1R.xyz
+\end{lstlisting}
+and for windows
+\begin{lstlisting}
+$ bin\polynomial_invariant --projection="1,0,0" examples\3_1R.xyz
+\end{lstlisting}
+The {\it Windows PowerShell} accepts both notation but the {\it Command Prompt} does not.
+\item {\bf Line endings.} Windows uses different line endings for text files than Linux and Mac OS X. Windows uses carriage return and line feed  \lstinline{\r\n} while Linux and Mac OS X use only line feed \lstinline{\n}. This is not a problem for {\it Knoto-ID} as it can read files with both line endings. However, all text files distributed with {\it Knoto-ID} use Linux/Mac OS X line endings and may not be properly displayed in Windows (e.g. {\it Notepad}). Please use a text editor that supports both line endings (such as atom\footnote{\url{https://atom.io/}}, notepad++\footnote{\url{https://notepad-plus-plus.org/}}, emacs\footnote{\url{https://www.gnu.org/software/emacs/}}, vim\footnote{\url{https://www.vim.org/}}, ...)
+\end{itemize}
+
+\subsection{Copyright}
+Copyright (C) 2017 by SIB Swiss Institute of Bioinformatics, Julien Dorier and Dimos Goundaroulis.
+
+\subsection{Licensing}
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see \url{http://www.gnu.org/licenses/}.
+
+\clearpage
+\input{\cmakesrcpath/tutorial}
+\input{\cmakesrcpath/reference}
+\input{\cmakesrcpath/theory}
+
+
+\bibliographystyle{unsrt} 
+\bibliography{bibliography}
+
+\end{document}
+

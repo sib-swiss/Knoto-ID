@@ -1,0 +1,74 @@
+====================================================================
+Knoto-ID v1.1.0
+====================================================================
+
+New features:
+
+* polynomial_invariant read/write knot(oid) diagrams in extended Gauss
+  code format. (--input-format=gauss and --output-diagram-format=gauss).
+
+* New executable convert_diagram to convert knot(oid) diagram to
+  various formats (PD codes, extended Gauss codes, and xyz).
+
+* New script plot_diagram.R to draw knot(oid) diagrams using output
+  from convert_diagram in xyz format.
+
+* script plot_projection_map.R: it is now possible to plot a curve
+  with the 3D globe (new option --curve-3D).
+
+* For all executables, check planarity of input diagrams with the
+  method described in Vijayan and Wigderson (1982). "Planarity of Edge
+  Ordered Graphs". Technical Report 307, Princeton University. This
+  method replaces the incomplete planarity test based on Euler's
+  formula (V-E+F=2). This is particularly important to detect invalid
+  inputs when using extended gauss codes or PD codes as input format.
+
+* New script pdb_to_xyz.R to convert pdb files to xyz format.
+
+* New script plot_3D_curve.R to convert 3D curve from xyz format to
+  webGL format and optionally highlight subchain such as knotted core.
+
+
+Changes:
+
+* scrips plot_projection_map.R and plot_knotted_core.R: color based on
+  polynomial instead of knot(oid) type. Regions with same knot(oid)
+  type (e.g. "UNKNOWN") but with different polynomials now have
+  different colors.
+
+* scrips plot_projection_map.R and plot_knotted_core.R: when knot(oid)
+  types are not available, color legend labels (polynomials) are trimmed
+  to 40 characters.
+
+* script plot_projection_map.R: to avoid problems with periodicity and
+  at the poles, the voronoi tesselation is done directly on the
+  sphere. Instead of package deldir, plot_projection_map.R requires
+  packages geometry and geosphere.
+
+* Updated examples/knotoid_names.txt. Changes in naming convention:
+  * use "*" instead of "#" for composite knotoids.
+  * suffixes "o" and "p" are not used anymore.
+  * Suffix "-" is replaced by "m"
+
+====================================================================
+Knoto-ID v1.0.1
+====================================================================
+
+Changes:
+
+* To improve the detection of invalid knot(oid) diagrams,
+  polynomial_invariant uses Euler's formula to quickly detect
+  non-realizable diagrams.
+
+* Updated examples/knotoid_names.txt.
+
+
+Bugs:
+
+* Fixed a bug where variables A and v could be exchanged when loading
+  polynomials from knotoid names database (--names-db). This would
+  result in wrong mapping between polynomials and knotoid names.
+  Note that for the knotoid names database (examples/knotoid_names.txt)
+  distributed with Knoto-ID v1.0.0, this bug only affects knotoid "k6.41p-"
+  which was incorrectly reported as UNKNOWN.
+

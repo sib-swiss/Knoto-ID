@@ -1,0 +1,1 @@
+Knotoid type: k5.25-	Polynomial:  + A^(-16) - A^(-12) - 2*A^(-10) + 2*A^(-6) + A^(-4)

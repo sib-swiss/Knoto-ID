@@ -1,0 +1,2 @@
+#index_first	index_last	length	frequency	polynomial
+0	1	2	1	 + 1

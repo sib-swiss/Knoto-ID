@@ -1,0 +1,353 @@
+#!/bin/bash
+
+exec_path="../build/src/"
+
+#usage basename cmd
+function create_test {
+    basename="$1"
+    cmdtmp="$2"
+    outputs=$(echo $cmdtmp|tr ' ' '\n'|grep -e "--output.*="|grep -v "stdout"|grep -v "format"|sed -e s@"[^=]*="@@) 
+    echo "$cmdtmp"
+    echo "$outputs"
+#    eval $cmdtmp || exit
+    scriptfilename=bin/${basename}_${count}.sh
+    echo count=$count
+    echo '#!/bin/bash' > $scriptfilename
+    echo 'set -eo pipefail' >> $scriptfilename
+    echo 'sourcepath="$1"' >> $scriptfilename
+    cmdtmp2=$(echo $cmdtmp|sed -e s@"${exec_path}"@"../src/"@g|sed -e s@"input/"@"\"\${sourcepath}\"/input/"@g|sed -e s@"output/"@""@g)
+    echo "${cmdtmp2}"' || exit $? ' >> $scriptfilename
+    for output in $outputs;do
+	echo "diff $(basename $output) \"\${sourcepath}\"/output/$(basename $output) || exit \$?"  >> $scriptfilename
+    done
+    chmod +x  $scriptfilename
+
+}
+count=0
+
+
+#knots with direct closure
+for f in  input/*xyz; do 
+    for closuremethod in "direct";do
+        for nbmovesIII in "100000";do
+	    xyz=`echo $RANDOM|awk 'function acos(x){return atan2(sqrt(1-x*x),x)};{srand($1);pi=3.14159265358979;u=rand();v=rand();theta=2*pi*u;phi=acos(2*v-1);dx=cos(theta)*sin(phi);dy=sin(theta)*sin(phi);dz=cos(phi);print dx","dy","dz}'`
+            for projection in "--projection=${xyz}";do
+                for names in "" "--names-db=input/input_knot_names.txt";do
+		    if [[ ! -f output/polynomial_invariant_${count}.txt ]]; then
+			create_test "polynomial_invariant" "${exec_path}/polynomial_invariant ${names} ${projection} --input-format=xyz --closure-method=${closuremethod} --nb-moves-III=${nbmovesIII}  --output=output/polynomial_invariant_${count}.txt $f"
+			##diagrams change from one run to the other due to random simplification
+		    fi
+		    count=$((count + 1))		    
+		done
+	    done
+	done
+    done
+done
+
+#knots with rays closure
+for f in  input/*xyz; do 
+    for closuremethod in "rays";do
+        for nbmovesIII in "100000";do
+	    xyz=`echo $RANDOM|awk 'function acos(x){return atan2(sqrt(1-x*x),x)};{srand($1);pi=3.14159265358979;u=rand();v=rand();theta=2*pi*u;phi=acos(2*v-1);dx=cos(theta)*sin(phi);dy=sin(theta)*sin(phi);dz=cos(phi);print dx","dy","dz}'`
+            for projection in "--projection=${xyz}" "--projections-list=input/input_projections.txt";do
+                for names in "" "--names-db=input/input_knot_names.txt";do
+		    if [[ ! -f output/polynomial_invariant_${count}.txt ]]; then
+			create_test "polynomial_invariant" "${exec_path}/polynomial_invariant ${names} ${projection} --input-format=xyz --closure-method=${closuremethod} --nb-moves-III=${nbmovesIII}  --output=output/polynomial_invariant_${count}.txt $f"
+		    fi
+		    count=$((count + 1))		    
+		done
+	    done
+	done
+    done
+done
+
+#knotoids
+for f in  input/*xyz; do
+    for planar in "" "--planar";do
+	for closuremethod in "open";do
+            for nbmovesIII in "100000";do
+		xyz=`echo $RANDOM|awk 'function acos(x){return atan2(sqrt(1-x*x),x)};{srand($1);pi=3.14159265358979;u=rand();v=rand();theta=2*pi*u;phi=acos(2*v-1);dx=cos(theta)*sin(phi);dy=sin(theta)*sin(phi);dz=cos(phi);print dx","dy","dz}'`
+		for projection in "--projection=${xyz}" "--projections-list=input/input_projections.txt";do
+                    for names in "" "--names-db=input/input_knotoid_names.txt";do
+			if [[ ! -f output/polynomial_invariant_${count}.txt ]]; then
+			    create_test "polynomial_invariant" "${exec_path}/polynomial_invariant ${planar} ${names} ${projection} --input-format=xyz --closure-method=${closuremethod} --nb-moves-III=${nbmovesIII}  --output=output/polynomial_invariant_${count}.txt $f"
+			fi
+		    count=$((count + 1))		    
+		    done
+		done
+	    done
+	done
+    done
+done
+
+
+#pd diagram open on the sphere
+for f in  input/input_diagram_open_sphere_*.txt; do
+    for nbmovesIII in "100000";do
+	xyz=`echo $RANDOM|awk 'function acos(x){return atan2(sqrt(1-x*x),x)};{srand($1);pi=3.14159265358979;u=rand();v=rand();theta=2*pi*u;phi=acos(2*v-1);dx=cos(theta)*sin(phi);dy=sin(theta)*sin(phi);dz=cos(phi);print dx","dy","dz}'`
+        for names in "" "--names-db=input/input_knotoid_names.txt";do
+	    if [[ ! -f output/polynomial_invariant_${count}.txt ]]; then
+		create_test "polynomial_invariant" "${exec_path}/polynomial_invariant  ${names} --input-format=pd  --nb-moves-III=${nbmovesIII}  --output=output/polynomial_invariant_${count}.txt $f"
+	    fi
+	    count=$((count + 1))		    
+	done
+    done
+done
+
+#pd diagram open on the plane
+for f in  input/input_diagram_open_plane_*.txt; do
+    for nbmovesIII in "100000";do
+	xyz=`echo $RANDOM|awk 'function acos(x){return atan2(sqrt(1-x*x),x)};{srand($1);pi=3.14159265358979;u=rand();v=rand();theta=2*pi*u;phi=acos(2*v-1);dx=cos(theta)*sin(phi);dy=sin(theta)*sin(phi);dz=cos(phi);print dx","dy","dz}'`
+        for names in "" "--names-db=input/input_knotoid_names.txt";do
+	    if [[ ! -f output/polynomial_invariant_${count}.txt ]]; then
+		create_test "polynomial_invariant" "${exec_path}/polynomial_invariant --planar  ${names} --input-format=pd  --nb-moves-III=${nbmovesIII}  --output=output/polynomial_invariant_${count}.txt $f"
+	    fi
+	    count=$((count + 1))		    
+	done
+    done
+done
+
+#pd diagram closed
+for f in  input/input_diagram_closed_*.txt; do
+    for nbmovesIII in "100000";do
+	xyz=`echo $RANDOM|awk 'function acos(x){return atan2(sqrt(1-x*x),x)};{srand($1);pi=3.14159265358979;u=rand();v=rand();theta=2*pi*u;phi=acos(2*v-1);dx=cos(theta)*sin(phi);dy=sin(theta)*sin(phi);dz=cos(phi);print dx","dy","dz}'`
+        for names in "" "--names-db=input/input_knot_names.txt";do
+	    if [[ ! -f output/polynomial_invariant_${count}.txt ]]; then
+		create_test "polynomial_invariant" "${exec_path}/polynomial_invariant   ${names} --input-format=pd  --nb-moves-III=${nbmovesIII}  --output=output/polynomial_invariant_${count}.txt $f"
+	    fi
+	    count=$((count + 1))		    
+	done
+    done
+done
+
+
+
+
+
+
+
+
+
+#gauss code, diagram open on the sphere
+for f in  input/input_diagram_gauss_open_sphere_*.txt; do
+    for nbmovesIII in "100000";do
+	xyz=`echo $RANDOM|awk 'function acos(x){return atan2(sqrt(1-x*x),x)};{srand($1);pi=3.14159265358979;u=rand();v=rand();theta=2*pi*u;phi=acos(2*v-1);dx=cos(theta)*sin(phi);dy=sin(theta)*sin(phi);dz=cos(phi);print dx","dy","dz}'`
+        for names in "" "--names-db=input/input_knotoid_names.txt";do
+	    if [[ ! -f output/polynomial_invariant_${count}.txt ]]; then
+		create_test "polynomial_invariant" "${exec_path}/polynomial_invariant  ${names} --input-format=gauss  --nb-moves-III=${nbmovesIII}  --output=output/polynomial_invariant_${count}.txt $f"
+	    fi
+	    count=$((count + 1))		    
+	done
+    done
+done
+
+#gauss code,  diagram open on the plane
+for f in  input/input_diagram_gauss_open_plane_*.txt; do
+    for nbmovesIII in "100000";do
+	xyz=`echo $RANDOM|awk 'function acos(x){return atan2(sqrt(1-x*x),x)};{srand($1);pi=3.14159265358979;u=rand();v=rand();theta=2*pi*u;phi=acos(2*v-1);dx=cos(theta)*sin(phi);dy=sin(theta)*sin(phi);dz=cos(phi);print dx","dy","dz}'`
+        for names in "" "--names-db=input/input_knotoid_names.txt";do
+	    if [[ ! -f output/polynomial_invariant_${count}.txt ]]; then
+		create_test "polynomial_invariant" "${exec_path}/polynomial_invariant --planar  ${names} --input-format=gauss  --nb-moves-III=${nbmovesIII}  --output=output/polynomial_invariant_${count}.txt $f"
+	    fi
+	    count=$((count + 1))		    
+	done
+    done
+done
+
+#gauss code, diagram closed
+for f in  input/input_diagram_gauss_closed_*.txt; do
+    for nbmovesIII in "100000";do
+	xyz=`echo $RANDOM|awk 'function acos(x){return atan2(sqrt(1-x*x),x)};{srand($1);pi=3.14159265358979;u=rand();v=rand();theta=2*pi*u;phi=acos(2*v-1);dx=cos(theta)*sin(phi);dy=sin(theta)*sin(phi);dz=cos(phi);print dx","dy","dz}'`
+        for names in "" "--names-db=input/input_knot_names.txt";do
+	    if [[ ! -f output/polynomial_invariant_${count}.txt ]]; then
+		create_test "polynomial_invariant" "${exec_path}/polynomial_invariant   ${names} --input-format=gauss --closure-method=direct  --nb-moves-III=${nbmovesIII}  --output=output/polynomial_invariant_${count}.txt $f"
+	    fi
+	    count=$((count + 1))		    
+	done
+    done
+done
+
+count=0
+#######################
+#knotted core
+#########################
+inputs=( input/input0.xyz input/input1.xyz input/input4.xyz input/input5.xyz input/input6.xyz input/input7.xyz )
+
+#knots with direct closure
+for f in "${inputs[@]}"; do 
+    for cyclicinput in "" "--cyclic-input";do
+	for closuremethod in "direct";do
+	    for names in "" "--names-db=input/input_knot_names.txt";do
+		if [[ ! -f output/knotted_core_${count}.txt ]]; then
+		    create_test "knotted_core" "${exec_path}/knotted_core ${names} ${cyclicinput} --closure-method=${closuremethod}  --output=output/knotted_core_${count}.txt --output-search=output/knotted_core_${count}_search.txt $f"
+		fi
+		count=$((count + 1))		    
+	    done
+	done
+    done
+done
+
+
+#knots with rays closure
+for f in "${inputs[@]}"; do 
+    for cyclicinput in "" "--cyclic-input";do
+	for closuremethod in "rays";do
+            for names in "" "--names-db=input/input_knot_names.txt";do
+		if [[ ! -f output/knotted_core_${count}.txt ]]; then
+		    create_test "knotted_core" "${exec_path}/knotted_core ${names} ${cyclicinput} --projections-list=input/input_projections.txt --closure-method=${closuremethod}  --output=output/knotted_core_${count}.txt --output-search=output/knotted_core_${count}_search.txt $f"
+		fi
+		    count=$((count + 1))		    
+	    done
+	done
+    done
+done
+
+#knotoids
+for f in "${inputs[@]}"; do 
+    for planar in "" "--planar";do
+	for cyclicinput in "" "--cyclic-input";do
+	    for closuremethod in "open";do
+		for names in "" "--names-db=input/input_knotoid_names.txt";do
+		    if [[ ! -f output/knotted_core_${count}.txt ]]; then
+			create_test "knotted_core" "${exec_path}/knotted_core ${planar} ${names} ${cyclicinput} --projections-list=input/input_projections.txt --closure-method=${closuremethod}  --output=output/knotted_core_${count}.txt --output-search=output/knotted_core_${count}_search.txt $f"
+		    fi
+		    count=$((count + 1))		    
+		done
+	    done
+	done
+    done
+done
+
+
+count=0
+#########################
+#convert_diagram
+#########################
+
+#input: xyz. output: pd, gauss
+for f in  input/*xyz; do 
+    for closuremethod in "direct" "open" ;do
+        for planar in "--planar" "" ;do
+	    for outputformat in "pd" "gauss" ;do
+		for closediagram in "--close-diagram" "" ;do
+		    xyz=`echo $RANDOM|awk 'function acos(x){return atan2(sqrt(1-x*x),x)};{srand($1);pi=3.14159265358979;u=rand();v=rand();theta=2*pi*u;phi=acos(2*v-1);dx=cos(theta)*sin(phi);dy=sin(theta)*sin(phi);dz=cos(phi);print dx","dy","dz}'`
+		    for projection in "--projection=${xyz}";do
+			if [[ ! -f output/convert_diagram_${count}.txt ]]; then
+			    create_test "convert_diagram" "${exec_path}/convert_diagram ${closediagram} --input-format=xyz --output-format=${outputformat} ${projection} --closure-method=${closuremethod} --output=output/convert_diagram_${count}.txt $f"
+			fi
+			count=$((count + 1))
+		    done
+		done
+	    done
+	done
+    done
+done
+
+#input: pd diagram open on the sphere. output: pd, gauss
+for f in  input/input_diagram_open_sphere_*.txt; do
+    for outputformat in "pd" "gauss" ;do
+	for projection in "--projection=${xyz}";do
+	    for closediagram in "--close-diagram" "" ;do
+		if [[ ! -f output/convert_diagram_${count}.txt ]]; then
+		    create_test "convert_diagram" "${exec_path}/convert_diagram ${closediagram} --input-format=pd --output-format=${outputformat} --output=output/convert_diagram_${count}.txt $f"
+		fi
+		count=$((count + 1))
+	    done
+	done
+    done
+done
+
+#input: pd diagram open on the plane. output: pd, gauss
+for f in  input/input_diagram_open_plane_*.txt; do
+    for outputformat in "pd" "gauss" ;do
+	for projection in "--projection=${xyz}";do
+	    for closediagram in "--close-diagram" "" ;do
+		if [[ ! -f output/convert_diagram_${count}.txt ]]; then
+		    create_test "convert_diagram" "${exec_path}/convert_diagram ${closediagram} --input-format=pd --planar --output-format=${outputformat} --output=output/convert_diagram_${count}.txt $f"
+		fi
+		count=$((count + 1))
+	    done
+	done
+    done
+done
+
+#input: pd diagram closed. output: pd, gauss
+for f in  input/input_diagram_closed_*.txt; do
+    for outputformat in "pd" "gauss" ;do
+	for projection in "--projection=${xyz}";do
+	    for closediagram in "--close-diagram" "" ;do
+		if [[ ! -f output/convert_diagram_${count}.txt ]]; then
+		    create_test "convert_diagram" "${exec_path}/convert_diagram ${closediagram} --input-format=pd --output-format=${outputformat} --output=output/convert_diagram_${count}.txt $f"
+		fi
+		count=$((count + 1))
+	    done
+	done
+    done
+done
+
+
+
+#gauss code, diagram open on the sphere
+for f in  input/input_diagram_gauss_open_sphere_*.txt; do
+    for outputformat in "pd" "gauss" ;do
+	for projection in "--projection=${xyz}";do
+	    for closediagram in "--close-diagram" "" ;do
+		if [[ ! -f output/convert_diagram_${count}.txt ]]; then
+		    create_test "convert_diagram" "${exec_path}/convert_diagram ${closediagram} --input-format=gauss --output-format=${outputformat} --output=output/convert_diagram_${count}.txt $f"
+		fi
+		count=$((count + 1))
+	    done
+	done
+    done
+done
+
+#gauss code, diagram open on the plane
+for f in  input/input_diagram_gauss_open_plane_*.txt; do
+    for outputformat in "pd" "gauss" ;do
+	for projection in "--projection=${xyz}";do
+	    for closediagram in "--close-diagram" "" ;do
+		if [[ ! -f output/convert_diagram_${count}.txt ]]; then
+		    create_test "convert_diagram" "${exec_path}/convert_diagram ${closediagram} --input-format=gauss --planar --output-format=${outputformat} --output=output/convert_diagram_${count}.txt $f"
+		fi
+		count=$((count + 1))
+	    done
+	done
+    done
+done
+
+#gauss code, diagram closed
+for f in  input/input_diagram_gauss_closed_*.txt; do
+    for outputformat in "pd" "gauss" ;do
+	for projection in "--projection=${xyz}";do
+	    for closediagram in "--close-diagram" "" ;do
+		if [[ ! -f output/convert_diagram_${count}.txt ]]; then
+		    --input-format=xyz --output-format=${outputformat}
+		    create_test "convert_diagram" "${exec_path}/convert_diagram ${closediagram} ${closediagram} --input-format=gauss --closure-method=direct --output-format=${outputformat} --output=output/convert_diagram_${count}.txt $f"
+		fi
+		count=$((count + 1))
+	    done
+	done
+    done
+done
+
+
+
+#input: xyz. output: xyz. test: polynomial invariant. Note: other inputs are too complex, the resulting diagram is highly unbalanced => problems of projection with polynomial_invariant.
+for f in  input/input0.xyz input/input1.xyz input/input4.xyz input/input5.xyz input/input6.xyz input/input7.xyz; do 
+    for closuremethod in "direct" "open" ;do
+        for planar in "--planar" "" ;do
+	    for nbiterrelax in  "1000" ;do
+		xyz=`echo $RANDOM|awk 'function acos(x){return atan2(sqrt(1-x*x),x)};{srand($1);pi=3.14159265358979;u=rand();v=rand();theta=2*pi*u;phi=acos(2*v-1);dx=cos(theta)*sin(phi);dy=sin(theta)*sin(phi);dz=cos(phi);print dx","dy","dz}'`
+		for projection in "--projection=${xyz}";do
+		    if [[ ! -f output/convert_diagram_${count}.txt ]]; then
+			create_test "convert_diagram" "${exec_path}/convert_diagram --input-format=xyz --output-format=xyz ${projection} --closure-method=${closuremethod} ${planar} --force --nb-iterations-relaxation=${nbiterrelax} --nb-points-spline=2 --output=stdout $f |cut -d' ' -f1-3 | ${exec_path}/polynomial_invariant --closure-method=${closuremethod} ${planar} --output=output/convert_diagram_${count}.txt --projection=0,0,1 stdin"
+			
+		    fi
+		    count=$((count + 1))
+		done
+	    done
+	done
+    done
+done
+
+

@@ -1,0 +1,2 @@
+#frequency	knotoid_type	polynomial
+1	k0.1	 + 1

@@ -1,0 +1,1 @@
+Polynomial:  - A^(2)*v - A^(4)

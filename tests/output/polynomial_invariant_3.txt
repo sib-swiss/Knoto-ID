@@ -1,0 +1,1 @@
+Knot type: 0_1	Polynomial:  + 1
