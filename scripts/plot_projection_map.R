@@ -65,6 +65,7 @@ if(!is.null(output3D))
 library(ggplot2)
 library(geometry)
 library(geosphere)
+library(rmarkdown)
 
 #geosphere::distCosine(p1, p2, r=1) is unstable for small distances
 distCosine=function(p1,p2){
@@ -411,9 +412,12 @@ if(!is.null(output3D))
         filename=output3D 
         cat("creating  ",filename,"\n")
         ##NOTE: selfcontained=TRUE -> require pandoc.
-       tryCatch(
-           htmlwidgets::saveWidget(rglwidget(sizingPolicy=htmlwidgets::sizingPolicy(padding = 0, browser.fill = TRUE,viewer.fill=TRUE)), filename),
-           error=function(e){
+        if(pandoc_available())
+            {
+               htmlwidgets::saveWidget(rglwidget(sizingPolicy=htmlwidgets::sizingPolicy(padding = 0, browser.fill = TRUE,viewer.fill=TRUE)), normalizePath(filename,mustWork =TRUE))
+            }
+        else
+            {
                cat("***************************************************\n")
                cat("WARNING: could not create self contained html file\n")
                cat(filename,"\n")               
@@ -422,9 +426,7 @@ if(!is.null(output3D))
                cat("To avoid this message, install pandoc(http://pandoc.org/)\n")
                cat("and make sure it can be found by R.\n")
                cat("***************************************************\n")
-               htmlwidgets::saveWidget(rglwidget(sizingPolicy=htmlwidgets::sizingPolicy(padding = 0, browser.fill = TRUE,viewer.fill=TRUE)), filename,selfcontained=FALSE)
-              }
-           )
-
+               htmlwidgets::saveWidget(rglwidget(sizingPolicy=htmlwidgets::sizingPolicy(padding = 0, browser.fill = TRUE,viewer.fill=TRUE)), normalizePath(filename,mustWork =TRUE),selfcontained=FALSE)
+            }
     }
 

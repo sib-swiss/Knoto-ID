@@ -4,7 +4,7 @@ The backbone of most proteins forms an open curve.  To study their
 entanglement, a common strategy consists in searching for the presence
 of knots in their backbones using topological invariants.  However,
 this approach requires to close the curve into a loop, which alters
-the geometry of curve.  Knoto-ID allows evaluating the entanglement of
+its geometry.  Knoto-ID allows evaluating the entanglement of
 open curves without the need to close them, using the recent concept
 of knotoids which is a generalization of classical knot theory to open
 curves.  Knoto-ID can analyse the global topology of the full chain as
@@ -16,7 +16,7 @@ as chromosomes, synthetic polymers, random walks, etc.
 If you use this software for a publication, please cite:
 J. Dorier, D. Goundaroulis, F. Benedetti and A. Stasiak, "Knoto-ID: a
 tool to study the entanglement of open protein chains using the
-concept of knotoids", submitted (2018).
+concept of knotoids", Bioinformatics (2018).
 
 Source code is available at <https://github.com/sib-swiss/Knoto-ID>.
 

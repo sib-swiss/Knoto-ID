@@ -289,7 +289,7 @@ int main(int argc, char **argv)
       cout<<"along with Knoto-ID.  If not, see <http://www.gnu.org/licenses/>."<<endl;
       cout<<endl;
       cout<<"If you use this software for a publication, please cite:"<<endl;
-      cout<<"J. Dorier, D. Goundaroulis, F. Benedetti and A. Stasiak, \"Knoto-ID: a tool to study the entanglement of open protein chains using the concept of knotoids\", submitted (2018)."<<endl;
+      cout<<"J. Dorier, D. Goundaroulis, F. Benedetti and A. Stasiak, \"Knoto-ID: a tool to study the entanglement of open protein chains using the concept of knotoids\", Bioinformatics (2018)."<<endl;
       cout<<endl;
       exit(0);
     case 1:

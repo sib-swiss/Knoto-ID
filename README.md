@@ -18,7 +18,7 @@ If you use this software for a publication, please cite:
 
 J. Dorier, D. Goundaroulis, F. Benedetti and A. Stasiak, "Knoto-ID: a
 tool to study the entanglement of open protein chains using the
-concept of knotoids", submitted (2018).
+concept of knotoids", Bioinformatics (2018).
 
 Precompiled binary distributions, with a user guide and examples, are
 available for Linux, Mac OS X and Windows at

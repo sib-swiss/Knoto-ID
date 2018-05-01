@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Knoto-ID.  If not, see <http://www.gnu.org/licenses/>.
 
-
 #ifndef RANDOM_HH 
 #define RANDOM_HH
 
