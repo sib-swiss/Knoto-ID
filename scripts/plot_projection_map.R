@@ -338,7 +338,10 @@ maxcolors=brewer.pal.info["Set1","maxcolors"]
 }
 if(!is.null(output))
     {
-
+        if(!dir.exists(dirname(output)))
+        {
+            dir.create(dirname(output), recursive = TRUE)
+        }
         cat("creating  ",output,"\n")
         png(output,3000,2000,res=300)
         print(p)
@@ -409,24 +412,29 @@ if(!is.null(output3D))
             }
 
         
-        filename=output3D 
+        filename=output3D
+        if(!dir.exists(dirname(output3D)))
+        {
+            dir.create(dirname(output3D), recursive = TRUE)
+        }
+        filename.full=file.path(normalizePath(dirname(output3D),mustWork =TRUE),basename(output3D))
         cat("creating  ",filename,"\n")
         ##NOTE: selfcontained=TRUE -> require pandoc.
         if(pandoc_available())
-            {
-               htmlwidgets::saveWidget(rglwidget(sizingPolicy=htmlwidgets::sizingPolicy(padding = 0, browser.fill = TRUE,viewer.fill=TRUE)), normalizePath(filename,mustWork =TRUE))
-            }
+        {
+            htmlwidgets::saveWidget(rglwidget(sizingPolicy=htmlwidgets::sizingPolicy(padding = 0, browser.fill = TRUE,viewer.fill=TRUE)),filename.full,selfcontained =TRUE)
+        }
         else
-            {
-               cat("***************************************************\n")
-               cat("WARNING: could not create self contained html file\n")
-               cat(filename,"\n")               
-               cat("External resources are saved in directory\n")
-               cat(paste(tools::file_path_sans_ext(basename(filename)),"_files", sep = ""),"/ \n",sep="")
-               cat("To avoid this message, install pandoc(http://pandoc.org/)\n")
-               cat("and make sure it can be found by R.\n")
-               cat("***************************************************\n")
-               htmlwidgets::saveWidget(rglwidget(sizingPolicy=htmlwidgets::sizingPolicy(padding = 0, browser.fill = TRUE,viewer.fill=TRUE)), normalizePath(filename,mustWork =TRUE),selfcontained=FALSE)
-            }
+        {
+            cat("***************************************************\n")
+            cat("WARNING: could not create self contained html file\n")
+            cat(filename,"\n")               
+            cat("External resources are saved in directory\n")
+            cat(paste(tools::file_path_sans_ext(basename(filename)),"_files", sep = ""),"/ \n",sep="")
+            cat("To avoid this message, install pandoc(http://pandoc.org/)\n")
+            cat("and make sure it can be found by R.\n")
+            cat("***************************************************\n")
+            htmlwidgets::saveWidget(rglwidget(sizingPolicy=htmlwidgets::sizingPolicy(padding = 0, browser.fill = TRUE,viewer.fill=TRUE)), filename.full,selfcontained=FALSE)
+        }
     }
 

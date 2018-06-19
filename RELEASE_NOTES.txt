@@ -1,3 +1,12 @@
+
+Bugs:
+
+* For all executables, also check Euler's formula (V-E+F=2) when
+  testing validity of input diagrams.
+
+* Fixed a bug in script plot_projection_map.R that crashed when the
+  file specified with --curve-3D did not exist (i.e. amost always).
+
 ====================================================================
 Knoto-ID v1.1.1
 ====================================================================

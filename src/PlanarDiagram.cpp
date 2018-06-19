@@ -3928,6 +3928,36 @@ bool PlanarDiagram::check()
 	cerr<<" check diagram: open diagram with (nb arcs)!=2*(nb crossings)+1"<<endl;
       return false;
     }
+
+  //check for planarity using euler formula v-e+f=2  with v=(ncrossings incl endpoints), e=narcs, f=nbregions incl exterior.
+  create_regions();
+  set<int> regions;//all regions, including exterior
+  nbcrossings=0;//nb crossings, including endpoints
+  for(int n=0;n<crossings.size();n++)
+    {
+      if(crossings[n].arc0<0&&crossings[n].arc1<0&&crossings[n].arc2<0&&crossings[n].arc3<0)//removed crossing
+	continue;
+      nbcrossings++;
+      if(crossings[n].arc0>=0&&crossings[n].arc1<0&&crossings[n].arc2<0&&crossings[n].arc3<0)//endpoint
+	{
+	  regions.insert(crossings[n].get_region(0,1));
+	}
+      else
+	{
+	  for(int i=0;i<4;i++)
+	    {
+	      if(crossings[n].get_region(i,(i+1)%4)!=-1)	    
+		regions.insert(crossings[n].get_region(i,(i+1)%4));
+	    }
+	}
+    }
+  int nbregions=regions.size();
+  if(nbcrossings-nbarcs+nbregions!=2)
+    {
+      if(flag_debug)
+	cerr<<" check diagram: non-planar diagram (euler's formula)"<<endl;
+      return false;
+    }
   
   if(!check_planar())
     {
@@ -4019,15 +4049,26 @@ bool PlanarDiagram::check_planar()
     for(int l=0;l<articulation_points.size();l++)
       {
 	int n=graph[articulation_points[l]].crossing;
-	for(int i=0;i<2;i++)
-	  if(crossings[n].get_arc(i)==crossings[n].get_arc((i+2)%4)
-	     &&crossings[n].get_arc(i)!=crossings[n].get_arc((i+1)%4)
-	     &&crossings[n].get_arc(i)!=crossings[n].get_arc((i+3)%4))
-	    {
-	      if(flag_debug)
-		cerr<<" check diagram planarity: non-planar diagram (illegal articulation point)"<<endl;
-	      return false;
-	    }
+	int bc1,bc2,bc3,bc4;
+	if(crossings[n].arc0>=0&&crossings[n].arc1<0&&crossings[n].arc2<0&&crossings[n].arc3<0)//endpoint
+	  continue;
+	if(n==crossings[n].get_connected_crossing(0)||
+	   n==crossings[n].get_connected_crossing(1)||
+	   n==crossings[n].get_connected_crossing(2)||
+	   n==crossings[n].get_connected_crossing(3))//self loop: not in graph, already checked when creating graph.
+	  continue;
+
+	bc1=graph[edge(map_crossing_to_vertex[n], map_crossing_to_vertex[crossings[n].get_connected_crossing(0)],graph).first].component;
+	bc2=graph[edge(map_crossing_to_vertex[n], map_crossing_to_vertex[crossings[n].get_connected_crossing(1)],graph).first].component;
+	bc3=graph[edge(map_crossing_to_vertex[n], map_crossing_to_vertex[crossings[n].get_connected_crossing(2)],graph).first].component;
+	bc4=graph[edge(map_crossing_to_vertex[n], map_crossing_to_vertex[crossings[n].get_connected_crossing(3)],graph).first].component;
+	if(bc1==bc3&&bc2==bc4&&bc1!=bc2)
+	  {
+	    if(flag_debug)
+	      cerr<<" check diagram planarity: non-planar diagram (illegal articulation point)"<<endl;
+	    return false;
+	  }
+	
       }
 
 
