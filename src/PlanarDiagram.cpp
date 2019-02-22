@@ -2007,17 +2007,24 @@ void PlanarDiagram::simplify()
 }
 
 //--------------------------------------------------------------------------
-void PlanarDiagram::simplify_with_random_reidemeister_moves_III( long maxiterations)  
+void PlanarDiagram::simplify_with_random_reidemeister_moves_III( long maxiterations,long maxiterations_unsuccessfull)  
 {
   if(maxiterations==0)
     return;
   if(flag_debug)cerr<<"DEBUG: try reidemeister moves III, nb crossings="<<get_nb_crossings()<<endl;
   time_t t0=time(NULL);
   bool flag_output_status=false;
+  long last_change=0;
   for( long iter=0;iter<maxiterations;iter++)
     {
+      if(iter>=last_change+maxiterations_unsuccessfull)
+	{
+	  break;
+	}
       if(crossings.size()<3)
-	return;
+	{
+	  break;
+	}
 
       //find n-l-m  non-removed-crossings      
       int n=random01()*crossings.size();
@@ -2040,14 +2047,11 @@ void PlanarDiagram::simplify_with_random_reidemeister_moves_III( long maxiterati
 	  if(time(NULL)-t0>1)
 	    {
 	      t0=time(NULL);
-	      cerr<<"\r"<<" reidemeister moves III: "<<(iter*100)/maxiterations<<"%"<<" (nb crossings="<<get_nb_crossings()<<")";//".";
+	      cerr<<"\r"<<" reidemeister moves III: "<<(iter*100)/maxiterations<<"%"<<" (nb crossings="<<get_nb_crossings()<<")      ";//".";
 	      flag_output_status=true;
 	    }
 	  continue;
 	}
-      if(flag_output_status)
-	cerr<<endl;
-      flag_output_status=false;
       if(flag_debug)
 	{
 	  save_to_file_list(cerr);
@@ -2077,6 +2081,7 @@ void PlanarDiagram::simplify_with_random_reidemeister_moves_III( long maxiterati
 
       if(flag_has_changed)
 	{
+ 	  last_change=iter;
 	  if(flag_debug)
 	      cerr<<"Cleaning"<<endl;
 	  clean();

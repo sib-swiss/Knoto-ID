@@ -29,6 +29,7 @@ bool flag_3d_reduction=false;
 bool flag_simplify_diagram=false;
 bool flag_planar=false; //diagram is on the plane (not the sphere) 
 long max_nb_random_moves_III=100000;
+long max_nb_unsuccessfull_random_moves_III=2000;//max number of move without improvement.
 unsigned long seed=time(NULL);
 string input_format="xyz"; //"xyz", "pd" or "gauss"
 string output_format="pd"; //"pd" or "gauss" or "xyz"
@@ -141,7 +142,12 @@ void display_usage(char **argv,bool flag_help_all=false){
   cerr<<endl;
   cerr<<"      --nb-moves-III=N"<<endl;
   cerr<<"           max number of iterations for simplification with random Reidemeister"<<endl;
-  cerr<<"           moves III (default="<<max_nb_random_moves_III<<")."<<endl;
+  cerr<<"           moves III (default="<<max_nb_random_moves_III<<"). Only used with --simplify-diagram."<<endl;
+  cerr<<endl;
+  cerr<<"      --nb-unsuccessfull-moves-III=N"<<endl;
+  cerr<<"           stop simplification with random Reidemeister if the diagram has not"<<endl;
+  cerr<<"           been simplified during the last N iterations (default="<<max_nb_unsuccessfull_random_moves_III<<")."<<endl;
+  cerr<<"           Only used with --simplify-diagram."<<endl;
   cerr<<endl;
   cerr<<"OPTIONS for xyz input format:"<<endl;
   cerr<<endl;
@@ -231,6 +237,7 @@ int main(int argc, char **argv)
     { "projection", required_argument, NULL, 1 },
     { "3D-reduction", no_argument, NULL, 2 },
     { "nb-moves-III", required_argument, NULL, 3 },
+    { "nb-unsuccessfull-moves-III", required_argument, NULL, 18 },
     { "simplify-diagram", no_argument, NULL, 4 },
     { "planar", no_argument, NULL, 'p' },
     { "help-debug", no_argument, NULL, 9 },
@@ -289,7 +296,12 @@ int main(int argc, char **argv)
       cout<<"along with Knoto-ID.  If not, see <http://www.gnu.org/licenses/>."<<endl;
       cout<<endl;
       cout<<"If you use this software for a publication, please cite:"<<endl;
-      cout<<"J. Dorier, D. Goundaroulis, F. Benedetti and A. Stasiak, \"Knoto-ID: a tool to study the entanglement of open protein chains using the concept of knotoids\", Bioinformatics (2018)."<<endl;
+      cout<<"J. Dorier, D. Goundaroulis, F. Benedetti and A. Stasiak, \"Knoto-ID: a tool to study the entanglement of open protein chains using the concept of knotoids\", Bioinformatics 34, 3402-3404 (2018)."<<endl;
+      cout<<endl;
+      cout<<"If you use the knotoid classification given in files"<<endl;
+      cout<<"examples/knotoid_names_sphere.txt or examples/knotoid_names_planar.txt,"<<endl;
+      cout<<"please cite:"<<endl;
+      cout<<"D. Goundaroulis, J. Dorier and A. Stasiak, \"A systematic classification of knotoids on the plane and on the sphere\", arXiv:1902.07277 [math.GT]"<<endl;
       cout<<endl;
       exit(0);
     case 1:
@@ -314,6 +326,9 @@ int main(int argc, char **argv)
       break;
     case 3:
       max_nb_random_moves_III=atol(optarg);
+      break;
+    case 18:
+      max_nb_unsuccessfull_random_moves_III=atol(optarg);
       break;
     case 4:
       flag_simplify_diagram=true;
@@ -569,7 +584,7 @@ int main(int argc, char **argv)
       if(max_nb_random_moves_III>0)
 	{
 	  cerr<<"Simplifying diagram with random Reidemeister moves III (max "<<max_nb_random_moves_III<<" moves)"<<endl;
-	  diagram.simplify_with_random_reidemeister_moves_III(max_nb_random_moves_III);
+	  diagram.simplify_with_random_reidemeister_moves_III(max_nb_random_moves_III,max_nb_unsuccessfull_random_moves_III);
 	  cerr<<"diagram has "<<diagram.get_nb_crossings(true)<<" crossings"<<endl;
 	  if(flag_debug)
 	    {

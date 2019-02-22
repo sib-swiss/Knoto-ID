@@ -1,3 +1,47 @@
+====================================================================
+Knoto-ID v1.2.0
+====================================================================
+
+New features:
+
+* For all executables, new option --nb-unsuccessfull-moves-III
+  to stop the simplification of the diagram with random type III
+  Reidemeister moves after a specified number of unsuccessfull
+  iterations.
+
+* New mapping from polynomials to knotoid names based on a systematic
+  classification of knotoids with up to 6 crossings on the sphere and
+  up to 5 crossings on the plane. File examples/knotoid_names_sphere.txt
+  contains names and polynomials (Jones polynomial for knotoids) for
+  all knotoid diagrams on the sphere with up to 6 crossings, including
+  composite knotoids. Since the classification is based on an
+  exhaustive enumeration of all diagrams with up to 6 crossings, if
+  the Jones polynomial of a knotoid diagram on the sphere does not
+  appear in the list (i.e. UNKNOWN) then it must have more than 6
+  crossings. Similarly, file examples/knotoid_names_planar.txt
+  contains names and polynomials (Turaev loop bracket) for all knotoid
+  diagrams on the plane with up to 5 crossings, including composite
+  knotoids. If the Turaev loop bracket of a knotoid diagram on the
+  plane does not appear in the list (UNKNOWN), this diagram has more
+  than 5 crossings.
+  More details on the classification of knotoids used to generate
+  these files can be found in:
+  D. Goundaroulis, J. Dorier and A. Stasiak, "A systematic
+  classification of knotoids on the plane and on the sphere"
+  arXiv:1902.07277 [math.GT].
+
+Changes:
+
+* Added composite knots to examples/knot_names.txt.
+
+* Replaced examples/knotoid_names.txt by
+  examples/knotoid_names_sphere.txt and
+  examples/knotoid_names_planar.txt for knotoids on the sphere
+  (without --planar) and on the plane (with --planar)
+  respectively.
+
+* Default --nb-moves-III set to 1000 for knotted_core (instead
+  of 10).
 
 Bugs:
 

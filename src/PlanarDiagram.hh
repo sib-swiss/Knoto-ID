@@ -271,8 +271,9 @@ public:
   void simplify();
   //iteratively remove crossings with Reidemeister moves I and II until no changes.
   //assumes that crossings are ordered along the polygon, otherwise, will fail to detect Reidemeister moves II
-  //then apply 1 random reidemeister move III and iterates
-  void simplify_with_random_reidemeister_moves_III( long maxiterations);
+  //then apply 1 random reidemeister move III and iterates during at most maxiterations iterations.
+  //Stop after maxiterations_unsuccessfull consecutive iterations without simplification.
+  void simplify_with_random_reidemeister_moves_III( long maxiterations,long maxiterations_unsuccessfull);
 
   void create_regions();//evaluate regions in the diagram, and store in crossings[n].region01/12/23/30 (1=outside, 2, 3,... are other regions). Only region 1 (outside) is kept, all other regions are revaluated. If flag_planar=false => start region numbering at 2, i.e. crossings[n].region01/12/23/30=2,3,4,5,6....
 

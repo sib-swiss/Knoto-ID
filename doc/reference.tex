@@ -84,6 +84,9 @@ The polynomial invariant is the classical Jones polynomial for knots\cite{jones}
 \item[\lstinline{--nb-moves-III=NMOVES}]\hfill\\
   Use \lstinline{NMOVES} iterations to simplify the knot(oid) diagram using Reidemeister move III\footnote{see section  ``\ref{sec:algorithms:diagramsimplication} \nameref{sec:algorithms:diagramsimplication}'' for more details.}.\\
   Default \lstinline{100000}.
+\item[\lstinline{--nb-unsuccessfull-moves-III=NMOVES}]\hfill\\
+  Stop simplification with Reidemeister move III if the knot(oid) diagram has not been simplified during the last \lstinline{NMOVES} iterations\footnote{see section  ``\ref{sec:algorithms:diagramsimplication} \nameref{sec:algorithms:diagramsimplication}'' for more details.}.\\
+  Default \lstinline{2000}.
 \item[\lstinline{--projection="X,Y,Z"}]\hfill\\ Project the input curve along projection direction (X,Y,Z). If not specified, use randomly chosen projection direction (with uniform distribution on the surface of the sphere).
 \item[\lstinline{-N NPROJ}, \lstinline{--nb-projections=NPROJ}]\hfill\\
   Choose \lstinline{NPROJ} random projection directions (with uniform distribution on the surface of the sphere) and evaluate the corresponding polynomial invariant for each projection. Note:
@@ -152,6 +155,9 @@ Note that the knotted core corresponds to the "top-down" knotted core discussed 
   For each subchain, evaluate its polynomial invariant for the knot(oid) diagram on a plane. If not specified, evaluate polynomial invariant for the knot(oid) diagram on the surface of a sphere. This option is only relevant for open curves (\lstinline{--closure-method=open}).
 \item[\lstinline{--nb-moves-III=NMOVES}]\hfill\\
   Use \lstinline{NMOVES} iterations to simplify the knot(oid) diagram using Reidemeister move III\footnote{see section  ``\ref{sec:algorithms:diagramsimplication} \nameref{sec:algorithms:diagramsimplication}'' for more details.}.\\
+  Default \lstinline{1000}.
+\item[\lstinline{--nb-unsuccessfull-moves-III=NMOVES}]\hfill\\
+  Stop simplification with Reidemeister move III if the knot(oid) diagram has not been simplified during the last \lstinline{NMOVES} iterations\footnote{see section  ``\ref{sec:algorithms:diagramsimplication} \nameref{sec:algorithms:diagramsimplication}'' for more details.}.\\
   Default \lstinline{10}.
 \item[\lstinline{-N NPROJ}, \lstinline{--nb-projections=NPROJ}]\hfill\\
   Use \lstinline{NPROJ} random projection directions (with uniform distribution on the surface of the sphere) to evaluate the dominant polynomial invariant of each subchain.  For cyclic subchains with closure method \lstinline{direct} the polynomial invariant (classical Jones polynomial) does not depend on the projection. To avoid useless computations \lstinline{NPROJ} will be set to 1.\\
@@ -241,8 +247,11 @@ Notes:
 \item[\lstinline{--simplify-diagram}]\hfill\\
   Simplify the knot(oid) diagram using Reidemeister moves.
 \item[\lstinline{--nb-moves-III=NMOVES}]\hfill\\
-  Use \lstinline{NMOVES} iterations to simplify the knot(oid) diagram using Reidemeister move III\footnote{see section  ``\ref{sec:algorithms:diagramsimplication} \nameref{sec:algorithms:diagramsimplication}'' for more details.}.\\
+  Use \lstinline{NMOVES} iterations to simplify the knot(oid) diagram using Reidemeister move III\footnote{see section  ``\ref{sec:algorithms:diagramsimplication} \nameref{sec:algorithms:diagramsimplication}'' for more details.}. This option is only used with \lstinline{--simplify-diagram}.\\
   Default \lstinline{100000}.
+\item[\lstinline{--nb-unsuccessfull-moves-III=NMOVES}]\hfill\\
+  Stop simplification with Reidemeister move III if the knot(oid) diagram has not been simplified during the last \lstinline{NMOVES} iterations\footnote{see section  ``\ref{sec:algorithms:diagramsimplication} \nameref{sec:algorithms:diagramsimplication}'' for more details.}. This option is only used with \lstinline{--simplify-diagram}.\\
+  Default \lstinline{2000}.
   %options for xyz input format
 \end{description}
 \paragraph{Options for xyz input format:}
@@ -289,9 +298,9 @@ The knot(oid) diagram is simplified by iteratively applying type I and II Reidem
 \paragraph{Random shuffling with type III Reidemeister.}
 Among all possible type III Reidemeister moves that can be applied to the knot(oid) diagram, one move is randomly chosen and applied to the diagram.
 This operation is followed by a simplification with  type I and II Reidemeister moves described previously.
-The combination of Random shuffling with type III Reidemeister followed by a simplification with  type I and II Reidemeister moves is then repeated multiple times (specified with \lstinline{--nb-moves-III}).
+The combination of Random shuffling with type III Reidemeister followed by a simplification with  type I and II Reidemeister moves is then repeated multiple times. This procedure stops after reaching a maximum number of iterations (specified with \lstinline{--nb-moves-III}) or if the knot(oid) diagram has not been simplified during a given number of consecutive iterations (specified with \lstinline{--nb-unsuccessfull-moves-III}).
 
-While the simplification method can strongly reduce the complexity of the knot(oid) diagram, and therefore the computational time, it introduces an overhead that can become non-negligible for relatively simple diagrams. Therefore it may be worth adjusting the number of iterations with \lstinline{--nb-moves-III} to find the optimal balance between computational effort spent in the simplification of the knot(oid) diagram and in the evaluation of the polynomial invariant.
+While this simplification method can strongly reduce the complexity of the knot(oid) diagram, and therefore the computational time, it introduces an overhead that can become non-negligible for relatively simple diagrams. Therefore it may be worth adjusting the number of iterations with \lstinline{--nb-moves-III} and \lstinline{--nb-unsuccessfull-moves-III} to find the optimal balance between computational effort spent in the simplification of the knot(oid) diagram and in the evaluation of the polynomial invariant.
 
 
 \subsubsection{\label{sec:algorithms:jonespolynomial}Polynomial invariant}
@@ -307,13 +316,13 @@ While the full fingerprint and disk matrices were shown to illustrate the algori
 \centering
 \includegraphics[width=0.49\textwidth,trim={300px 0 300px 0},clip]{knotted_core_search_open_1.png}
 \includegraphics[width=0.49\textwidth,trim={300px 0 300px 0},clip]{knotted_core_search_open_2.png}
-\caption{Left: Fingerprint matrix for the curve \lstinline{examples/3_1R_supercoiled.xyz}. The knotted core is shown with a yellow circle. Right: Search path to find the knotted core.}\label{fig:algorithm:knottedcore:open}
+\caption{Left: Fingerprint matrix for the curve \lstinline{examples/3_1m_supercoiled.xyz}. The knotted core is shown with a yellow circle. Right: Search path to find the knotted core.}\label{fig:algorithm:knottedcore:open}
 \end{figure}
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.49\textwidth,trim={300px 0 300px 0},clip]{knotted_core_search_closed_1.png}
 \includegraphics[width=0.49\textwidth,trim={300px 0 300px 0},clip]{knotted_core_search_closed_2.png}
-\caption{Left: Disk matrix for the curve \lstinline{examples/3_1R_supercoiled.xyz}. The knotted core is shown with a yellow circle. Right: Search path to find the knotted core.}\label{fig:algorithm:knottedcore:closed}
+\caption{Left: Disk matrix for the curve \lstinline{examples/3_1m_supercoiled.xyz}. The knotted core is shown with a yellow circle. Right: Search path to find the knotted core.}\label{fig:algorithm:knottedcore:closed}
 \end{figure}
 
 \subsubsection{\label{sec:algorithms:circlepacking}Circle packing}
@@ -568,7 +577,7 @@ Example, without knot type:
 Example, with knot type:
 \begin{lstlisting}
 #frequency  knot_type  polynomial
-0.7         3_1R       - A^(-16) + A^(-12) + A^(-4)
+0.7         3_1m       - A^(-16) + A^(-12) + A^(-4)
 0.3         0_1        + 1
 \end{lstlisting}
 
@@ -594,20 +603,20 @@ Example (without knot(oid) names):
 Example (with knot(oid) names):
 \begin{lstlistingverysmall}
 #projection.x projection.y projection.z knotoid_type polynomial                   PD_code
-0.483595      -0.85801     0.173072     k3.1o       - A^(-16) + A^(-12) + A^(-4)  PD[X[3,1,4,0],X[1,5,2,4],X[5,3,6,2]];
-0.521928      -0.578265    0.627058     k3.1o       - A^(-16) + A^(-12) + A^(-4)  PD[X[3,1,4,0],X[1,5,2,4],X[5,3,6,2]];
-0.898137      0.241849     0.367231     k3.1o       - A^(-16) + A^(-12) + A^(-4)  PD[X[7,0,8,1],X[4,2,5,1],X[2,6,3,5],X[6,4,7,3]];
--0.624015     0.596182     0.505146     k2.1        - A^(-10) + A^(-6) + A^(-4)   PD[X[0,3,1,2],X[3,2,4,1]];
-0.134038      -0.988518    -0.0697575   k3.1o       - A^(-16) + A^(-12) + A^(-4)  PD[X[5,1,6,0],X[1,5,2,4],X[2,8,3,7],X[6,4,7,3]];
+0.483595      -0.85801     0.173072     3_1m        - A^(-16) + A^(-12) + A^(-4)  PD[X[3,1,4,0],X[1,5,2,4],X[5,3,6,2]];
+0.521928      -0.578265    0.627058     3_1m        - A^(-16) + A^(-12) + A^(-4)  PD[X[3,1,4,0],X[1,5,2,4],X[5,3,6,2]];
+0.898137      0.241849     0.367231     3_1m        - A^(-16) + A^(-12) + A^(-4)  PD[X[7,0,8,1],X[4,2,5,1],X[2,6,3,5],X[6,4,7,3]];
+-0.624015     0.596182     0.505146     2_1m        - A^(-10) + A^(-6) + A^(-4)   PD[X[0,3,1,2],X[3,2,4,1]];
+0.134038      -0.988518    -0.0697575   3_1m        - A^(-16) + A^(-12) + A^(-4)  PD[X[5,1,6,0],X[1,5,2,4],X[2,8,3,7],X[6,4,7,3]];
 \end{lstlistingverysmall}
 Example with extended Gauss code instead of PD code:
 \begin{lstlistingverysmall}
 #projection.x projection.y projection.z knotoid_type polynomial                    gauss_code
-0.483595      -0.85801     0.173072     k3.1o       - A^(-16) + A^(-12) + A^(-4)   1 -2 3 -1 2 -3 +++
-0.521928      -0.578265    0.627058     k3.1o       - A^(-16) + A^(-12) + A^(-4)   1 -2 3 -1 2 -3 +++
-0.898137      0.241849     0.367231     k3.1o       - A^(-16) + A^(-12) + A^(-4)   1 2 -3 4 -2 3 -4 -1 -+++
--0.624015     0.596182     0.505146     k2.1        - A^(-10) + A^(-6) + A^(-4)    -1 2 1 -2 ++
-0.134038      -0.988518    -0.0697575   k3.1o       - A^(-16) + A^(-12) + A^(-4)   1 -2 -3 4 2 -1 -4 3 ++++
+0.483595      -0.85801     0.173072     3_1m        - A^(-16) + A^(-12) + A^(-4)   1 -2 3 -1 2 -3 +++
+0.521928      -0.578265    0.627058     3_1m        - A^(-16) + A^(-12) + A^(-4)   1 -2 3 -1 2 -3 +++
+0.898137      0.241849     0.367231     3_1m        - A^(-16) + A^(-12) + A^(-4)   1 2 -3 4 -2 3 -4 -1 -+++
+-0.624015     0.596182     0.505146     2_1m        - A^(-10) + A^(-6) + A^(-4)    -1 2 1 -2 ++
+0.134038      -0.988518    -0.0697575   3_1m        - A^(-16) + A^(-12) + A^(-4)   1 -2 -3 4 2 -1 -4 3 ++++
 \end{lstlistingverysmall}
 
 
@@ -633,24 +642,19 @@ Example:
 Tab separated input format with 2 columns used to specify the correspondence between polynomials and knot(oid) names. Each row contains a knot or knotoid name in the first column and the corresponding polynomial in the second column.
 While any string are accepted as a knot or knotoid name (as long as it does not contain a tab character), the polynomials must conform to the ``Polynomial'' format described in  section ``\ref{sec:format:polynomials} \nameref{sec:format:polynomials}''.
 
-Two rows may contain the same polynomial with a different knot(oid) names. All knot(oid) names corresponding to the same polynomial will be concatenated  with a \lstinline{|} separator. For example, knots 6\_2R and 12n\_0025L have the same classical Jones polynomial $-1 + A^{-20} - 2 A^{-16} + 2 A^{-12} - 2 A^{-8} + 2 A^{-4} + A^4$ and the  corresponding knot name will be \lstinline{6_2R|12n_0025L}.
+Two rows may contain the same polynomial with a different knot(oid) names. All knot(oid) names corresponding to the same polynomial will be concatenated  with a \lstinline{|} separator. For example, knots 6\_2 and 12n\_25m have the same classical Jones polynomial $+ A^{-4} - 1 + 2*A^{4} - 2*A^{8} + 2*A^{12} - 2*A^{16} + A^{20}$ and the  corresponding knot name will be \lstinline{6_2|12n_25m}.
 
 
 Example of list of knot names:
 \begin{lstlisting}
-0_1     1
-3_1R    -A^(-16) + A^(-12) + A^(-4)
-3_1L    A^4 + A^12 - A^16
-4_1     1 + A^(-8) - A^(-4) - A^4 + A^8
-5_1R    -A^(-28) + A^(-24) - A^(-20) + A^(-16) + A^(-8)
-5_1L    A^8 + A^16 - A^20 + A^24 - A^28
-5_2R    -A^(-24) + A^(-20) - A^(-16) + 2*A^(-12) - A^(-8) + A^(-4)
-5_2L    A^4 - A^8 + 2*A^12 - A^16 + A^20 - A^24
-6_1R    2 + A^(-16) - A^(-12) + A^(-8) - 2*A^(-4) - A^4 + A^8
-6_1L    2 + A^(-8) - A^(-4) - 2*A^4 + A^8 - A^12 + A^16
-6_2R    -1 + A^(-20) - 2*A^(-16) + 2*A^(-12) - 2*A^(-8) + 2*A^(-4) + A^4
-6_2L    -1 + A^(-4) + 2*A^4 - 2*A^8 + 2*A^12 - 2*A^16 + A^20
-6_3     3 - A^(-12) + 2*A^(-8) - 2*A^(-4) - 2*A^4 + 2*A^8 - A^12
+0_1     + 1
+3_1     + A^(4) + A^(12) - A^(16)
+3_1m    - A^(-16) + A^(-12) + A^(-4)
+4_1     + A^(-8) - A^(-4) + 1 - A^(4) + A^(8)
+5_1     + A^(8) + A^(16) - A^(20) + A^(24) - A^(28)
+5_1m    - A^(-28) + A^(-24) - A^(-20) + A^(-16) + A^(-8)
+5_2     + A^(4) - A^(8) + 2*A^(12) - A^(16) + A^(20) - A^(24)
+5_2m    - A^(-24) + A^(-20) - A^(-16) + 2*A^(-12) - A^(-8) + A^(-4)
 \end{lstlisting}
 
 
@@ -754,11 +758,11 @@ Example for an open chain, without knot(oid) type:
 Example for a closed chain (with $N=111$ points), with knot type:
 \begin{lstlisting}
 #index_first  index_last  length  frequency  knot_type  polynomial
-22            110         89      0.8        3_1R       - A^(-16) + A^(-12) + A^(-4)
-22            0           90      0.5        3_1R       - A^(-16) + A^(-12) + A^(-4)
-23            1           90      0.6        3_1R       - A^(-16) + A^(-12) + A^(-4)
-22            79          58      0.8        3_1R       - A^(-16) + A^(-12) + A^(-4)
-23            23          112     1          3_1R       - A^(-16) + A^(-12) + A^(-4)
+22            110         89      0.8        3_1m       - A^(-16) + A^(-12) + A^(-4)
+22            0           90      0.5        3_1m       - A^(-16) + A^(-12) + A^(-4)
+23            1           90      0.6        3_1m       - A^(-16) + A^(-12) + A^(-4)
+22            79          58      0.8        3_1m       - A^(-16) + A^(-12) + A^(-4)
+23            23          112     1          3_1m       - A^(-16) + A^(-12) + A^(-4)
 \end{lstlisting}
 Note that the length of last subchain is bigger than the number of input points, therefore the last subchain corresponds to the full input curve (with direct closure).
 

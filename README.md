@@ -18,7 +18,16 @@ If you use this software for a publication, please cite:
 
 J. Dorier, D. Goundaroulis, F. Benedetti and A. Stasiak, "Knoto-ID: a
 tool to study the entanglement of open protein chains using the
-concept of knotoids", Bioinformatics (2018).
+concept of knotoids", Bioinformatics 34, 3402-3404 (2018).
+
+If you use the knotoid classification given in files
+`examples/knotoid_names_sphere.txt` or `examples/knotoid_names_planar.txt`,
+please cite:
+
+D. Goundaroulis, J. Dorier and A. Stasiak, "A systematic
+classification of knotoids on the plane and on the sphere",
+arXiv:1902.07277 [math.GT].
+
 
 Precompiled binary distributions, with a user guide and examples, are
 available for Linux, Mac OS X and Windows at

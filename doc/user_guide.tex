@@ -142,8 +142,10 @@ This document starts with a tutorial (section ``\ref{sec:tutorial} \nameref{sec:
 
 \subsection{Credit}
 If you use this software for a publication, please cite:\\
-J. Dorier, D. Goundaroulis, F. Benedetti and A. Stasiak, "Knoto-ID: a tool to study the entanglement of open protein chains using the concept of knotoids", Bioinformatics (2018).
+J. Dorier, D. Goundaroulis, F. Benedetti and A. Stasiak, "Knoto-ID: a tool to study the entanglement of open protein chains using the concept of knotoids", Bioinformatics 34(19):3402--3404, 2018.
 
+If you use the knotoid classification\footnote{files \lstinline{examples/knotoid_names_sphere.txt} or \lstinline{examples/knotoid_names_planar.txt}}, please cite:\\
+D. Goundaroulis, J. Dorier and A. Stasiak, "A systematic classification of knotoids on the plane and on the sphere", arXiv:1902.07277 [math.GT].
 
 \subsection{Installation}
 Decompress Knoto-ID:
@@ -205,11 +207,11 @@ It should return \lstinline{TRUE}. When testing {\it Knoto-ID} on Windows 10, we
 \item {\bf Line continuation symbol.} In this document, we use the symbol \lstinlineT{\textbackslash} to break lines of code that should be entered as a single line. This symbol is properly interpreted in Linux and Mac OS X, but not in Windows. Windows users should not type this symbol but should manually concatenate consecutive lines separated by \lstinlineT{\textbackslash}. For example:
 \begin{lstlisting}
 $ bin/polynomial_invariant --projection="1,0,0" \
-  examples/3_1R.xyz
+  examples/3_1m.xyz
 \end{lstlisting}
 should be entered as     
 \begin{lstlisting}
-$ bin/polynomial_invariant --projection="1,0,0" examples/3_1R.xyz
+$ bin/polynomial_invariant --projection="1,0,0" examples/3_1m.xyz
 \end{lstlisting}
 \item{\bf {\ttfamily R} scripts.} On Windows, {\ttfamily R} scripts cannot be executed directly but must be passed as an argument to the {\ttfamily Rscript} executable distributed with {\ttfamily R}. If it is not on the path, first locate the {\ttfamily Rscript} executable. For example:
 \begin{lstlisting}
@@ -226,11 +228,11 @@ $ C:\'Program Files\R\R-3.4.3\bin\Rscript.exe' scripts/plot_diagram.R --output=o
 Please note that if the path contains space characters, as in this example, it must be enclosed between quotes.
 \item {\bf Paths.} In Windows, paths are written using backslashes \lstinlineT{\textbackslash}, while Linux and Mac OS X (and this document) use forward slashes  \lstinline{/}. For example, for Linux and Mac OS X
 \begin{lstlisting}
-$ bin/polynomial_invariant --projection="1,0,0" examples/3_1R.xyz
+$ bin/polynomial_invariant --projection="1,0,0" examples/3_1m.xyz
 \end{lstlisting}
 and for windows
 \begin{lstlisting}
-$ bin\polynomial_invariant --projection="1,0,0" examples\3_1R.xyz
+$ bin\polynomial_invariant --projection="1,0,0" examples\3_1m.xyz
 \end{lstlisting}
 The {\it Windows PowerShell} accepts both notation but the {\it Command Prompt} does not.
 \item {\bf Line endings.} Windows uses different line endings for text files than Linux and Mac OS X. Windows uses carriage return and line feed  \lstinline{\r\n} while Linux and Mac OS X use only line feed \lstinline{\n}. This is not a problem for {\it Knoto-ID} as it can read files with both line endings. However, all text files distributed with {\it Knoto-ID} use Linux/Mac OS X line endings and may not be properly displayed in Windows (e.g. {\it Notepad}). Please use a text editor that supports both line endings (such as atom\footnote{\url{https://atom.io/}}, notepad++\footnote{\url{https://notepad-plus-plus.org/}}, emacs\footnote{\url{https://www.gnu.org/software/emacs/}}, vim\footnote{\url{https://www.vim.org/}}, ...)

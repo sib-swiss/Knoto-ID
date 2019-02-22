@@ -32,7 +32,8 @@ bool flag_cyclic=false;//jones polynomial evaluation: flag_cyclic=true: knot, fl
 bool flag_3d_reduction=true;
 bool flag_simplify_diagram=true;
 bool flag_planar=false; //diagram is on the plane (not the sphere) 
-long max_nb_random_moves_III=10;
+long max_nb_random_moves_III=1000;
+long max_nb_unsuccessfull_random_moves_III=10;//max number of move without improvement.
 int nb_helper_beads_per_segment=0;// for hoomd debug output, add nb_helper_beads_per_segment per segments 
 unsigned long seed=time(NULL);
 string jones_method="recursive";
@@ -137,6 +138,10 @@ void display_usage(char **argv,bool flag_help_all=false){
   cerr<<"           max number of iterations for simplification with random Reidemeister"<<endl;
   cerr<<"           moves III (default="<<max_nb_random_moves_III<<")."<<endl;
   cerr<<endl;
+  cerr<<"      --nb-unsuccessfull-moves-III=N"<<endl;
+  cerr<<"           stop simplification with random Reidemeister if the diagram has not"<<endl;
+  cerr<<"           been simplified during the last N iterations (default="<<max_nb_unsuccessfull_random_moves_III<<")."<<endl;
+  cerr<<endl;
   cerr<<"  -N, --nb-projections=N"<<endl;  
   cerr<<"           use N random projection directions (with uniform distribution on"<<endl;
   cerr<<"           the surface of the sphere) to evaluate the dominant polynomial"<<endl;
@@ -227,6 +232,7 @@ int main(int argc, char **argv)
     { "cyclic-input", no_argument, NULL, 'C' },
     { "no-3D-reduction", no_argument, NULL, 2 },
     { "nb-moves-III", required_argument, NULL, 3 },
+    { "nb-unsuccessfull-moves-III", required_argument, NULL, 10 },
     { "no-diagram-simplification", no_argument, NULL, 4 },
     { "planar", no_argument, NULL, 'p' },
     { "nb-helper-beads", required_argument, NULL, 6 },
@@ -271,7 +277,12 @@ int main(int argc, char **argv)
       cout<<"along with Knoto-ID.  If not, see <http://www.gnu.org/licenses/>."<<endl;
       cout<<endl;
       cout<<"If you use this software for a publication, please cite:"<<endl;
-      cout<<"J. Dorier, D. Goundaroulis, F. Benedetti and A. Stasiak, \"Knoto-ID: a tool to study the entanglement of open protein chains using the concept of knotoids\", Bioinformatics (2018)."<<endl;
+      cout<<"J. Dorier, D. Goundaroulis, F. Benedetti and A. Stasiak, \"Knoto-ID: a tool to study the entanglement of open protein chains using the concept of knotoids\", Bioinformatics 34, 3402-3404 (2018)."<<endl;
+      cout<<endl;
+      cout<<"If you use the knotoid classification given in files"<<endl;
+      cout<<"examples/knotoid_names_sphere.txt or examples/knotoid_names_planar.txt,"<<endl;
+      cout<<"please cite:"<<endl;
+      cout<<"D. Goundaroulis, J. Dorier and A. Stasiak, \"A systematic classification of knotoids on the plane and on the sphere\", arXiv:1902.07277 [math.GT]"<<endl;
       cout<<endl;
       exit(0);
     case 'N':
@@ -288,6 +299,9 @@ int main(int argc, char **argv)
       break;
     case 3:
       max_nb_random_moves_III=atol(optarg);
+      break;
+    case 10:
+      max_nb_unsuccessfull_random_moves_III=atol(optarg);
       break;
     case 4:
       flag_simplify_diagram=false;
@@ -989,7 +1003,7 @@ string get_jones(Polygon & polygon,double & frequ,unsigned long nb_projections,s
 	      diagram.simplify();
 	      if(max_nb_random_moves_III>0)
 		{
-		  diagram.simplify_with_random_reidemeister_moves_III(max_nb_random_moves_III);
+		  diagram.simplify_with_random_reidemeister_moves_III(max_nb_random_moves_III,max_nb_unsuccessfull_random_moves_III);
 		  diagram.simplify();
 		}
 	    }
