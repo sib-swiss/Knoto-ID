@@ -1,3 +1,1 @@
-#frequency	knotoid_type	polynomial
-0.833333	k0.1	 + 1
-0.166667	k1.1p-	 - A^(2)*v - A^(4)
+Knot type: 5_2R|11n_57L|12n_0475L	Polynomial:  - A^(-24) + A^(-20) - A^(-16) + 2*A^(-12) - A^(-8) + A^(-4)

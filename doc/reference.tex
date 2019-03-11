@@ -39,8 +39,21 @@ Output the polynomial invariant, and optionally the knot(oid) diagram\footnote{O
 
 If options \lstinline{--nb-projections} or  \lstinline{--projections-list} are used, the above procedure is repeated for all projections, and the output is a distribution of polynomials.
 
-The polynomial invariant is the classical Jones polynomial for knots\cite{jones} when the curve in closed\\
-(\lstinline{--closure-method=direct} or \lstinline{rays}), the Jones polynomial for knotoids\cite{turaev,guka} when the curve is open and the knotoid diagram is on the surface of a sphere (\lstinline{--closure-method=open}, without \lstinline{--planar}), and the Turaev loop bracket polynomial for knotoid\cite{turaev}  when the curve is open and the knotoid diagram is on the surface of a plane (\lstinline{--closure-method=open} and \lstinline{--planar}).
+
+Polynomial invariants\footnote{Please see section ``\ref{sec:theory:jones} \nameref{sec:theory:jones}'' for more information on the polynomial invariants.}:
+\begin{itemize}
+\item With \lstinline{--closure-method=direct} or  \lstinline{--closure-method=rays}:\\
+  \emph{Classical Jones polynomial for knots}\cite{jones}.
+\item With \lstinline{--closure-method=open} (without \lstinline{--planar} nor \lstinline{--arrow-polynomial}):\\
+  \emph{Jones polynomial for knotoids} (on the sphere)\cite{turaev,guka}.
+\item With \lstinline{--closure-method=open} and  \lstinline{--planar} (without \lstinline{--arrow-polynomial}):\\
+  \emph{Turaev loop bracket polynomial for knotoids} (on the plane)\cite{turaev}.
+\item With \lstinline{--closure-method=open} and \lstinline{--arrow-polynomial} (without \lstinline{--planar}):\\
+  \emph{Arrow polynomial for knotoids} (on the sphere)\cite{guka,dye2009}.
+\item With \lstinline{--closure-method=open}, \lstinline{--planar} and \lstinline{--arrow-polynomial}:\\
+  \emph{Loop arrow polynomial for knotoids} (on the plane)\cite{gound2}.
+\end{itemize}
+By default, the polynomial invariant is the Jones polynomial for knotoids.
 
 
 \subsubsection{Options}
@@ -81,6 +94,8 @@ The polynomial invariant is the classical Jones polynomial for knots\cite{jones}
   Default: \lstinline{open}.
 \item[\lstinline{-p}, \lstinline{--planar}]\hfill\\
   Evaluate polynomial invariant for the knot(oid) diagram on a plane. If not specified, evaluate polynomial invariant for the knot(oid) diagram on the surface of a sphere. This option is only relevant for open curves (\lstinline{--closure-method=open}).
+\item[\lstinline{--arrow-polynomial}]\hfill\\
+  Evaluate the arrow polynomial instead of Jones polynomial for knotoids (without \lstinline{--planar}) and loop arrow polynomial instead of Turaev loop bracket (with \lstinline{--planar}). This option is only relevant for open curves (\lstinline{--closure-method=open}).
 \item[\lstinline{--nb-moves-III=NMOVES}]\hfill\\
   Use \lstinline{NMOVES} iterations to simplify the knot(oid) diagram using Reidemeister move III\footnote{see section  ``\ref{sec:algorithms:diagramsimplication} \nameref{sec:algorithms:diagramsimplication}'' for more details.}.\\
   Default \lstinline{100000}.
@@ -105,7 +120,7 @@ The polynomial invariant is the classical Jones polynomial for knots\cite{jones}
     \item Options  \lstinline{--nb-projections} and \lstinline{--projection} are ignored.                                  
   \end{itemize}
 \item[\lstinline{-n FILENAME}, \lstinline{--names-db=FILENAME}]\hfill\\
-  Load a list of polynomials with corresponding knot(oid) names from file \lstinline{FILENAME}\footnote{see section ``\ref{sec:format:namesdb} \nameref{sec:format:namesdb}'' for more information on the file format.}.
+  Load a list of polynomials with corresponding knot(oid) names from file \lstinline{FILENAME}\footnote{see section ``\ref{sec:format:namesdb} \nameref{sec:format:namesdb}'' for more information on the file format.}. If the special filename \lstinline{internal} is used, it loads the internal database instead. For knots, the internal database is based on the Rolfsen and Hoste-Thistlethwaite Knot tables while for knotoids it is based on the classification proposed in \cite{goundaroulis2019}\footnote{see also section ``\ref{sec:theory:notations} \nameref{sec:theory:notations}'' for more information on the knot(oid) naming convention.}.
 \item[\lstinline{--timeout=TIMEOUT}]\hfill\\
   Abort evaluation of polynomial invariant after \lstinline{TIMEOUT} seconds (integer number). Note: if the evaluation of the polynomial invariant is aborted, the polynomial is replaced by \lstinline{TIMEOUT}.
 \end{description}
@@ -125,6 +140,21 @@ By default, the curve is considered open, but it can be closed with option \lsti
 Output the knotted core,  and optionally all subchains tested when searching the knotted core (with option \lstinline{--output-search}) as well as all possible subchains of the input curve (with option \lstinline{--output-all}).
 
 Note that the knotted core corresponds to the "top-down" knotted core discussed by Tubiana and coauthors \cite{tubiana2011}.
+
+Polynomial invariants\footnote{Please see section ``\ref{sec:theory:jones} \nameref{sec:theory:jones}'' for more information on the polynomial invariants.}:
+\begin{itemize}
+\item With \lstinline{--closure-method=direct} or  \lstinline{--closure-method=rays}:\\
+  \emph{Classical Jones polynomial for knots}\cite{jones}.
+\item With \lstinline{--closure-method=open} (without \lstinline{--planar} nor \lstinline{--arrow-polynomial}):\\
+  \emph{Jones polynomial for knotoids} (on the sphere)\cite{turaev,guka}.
+\item With \lstinline{--closure-method=open} and  \lstinline{--planar} (without \lstinline{--arrow-polynomial}):\\
+  \emph{Turaev loop bracket polynomial for knotoids} (on the plane)\cite{turaev}.
+\item With \lstinline{--closure-method=open} and \lstinline{--arrow-polynomial} (without \lstinline{--planar}):\\
+  \emph{Arrow polynomial for knotoids} (on the sphere)\cite{guka,dye2009}.
+\item With \lstinline{--closure-method=open}, \lstinline{--planar} and \lstinline{--arrow-polynomial}:\\
+  \emph{Loop arrow polynomial for knotoids} (on the plane)\cite{gound2}.
+\end{itemize}
+By default, the polynomial invariant is the Jones polynomial for knotoids.
 
 \subsubsection{Options}
 \begin{description}
@@ -153,6 +183,8 @@ Note that the knotted core corresponds to the "top-down" knotted core discussed 
   Default: \lstinline{open}.
 \item[\lstinline{-p}, \lstinline{--planar}]\hfill\\
   For each subchain, evaluate its polynomial invariant for the knot(oid) diagram on a plane. If not specified, evaluate polynomial invariant for the knot(oid) diagram on the surface of a sphere. This option is only relevant for open curves (\lstinline{--closure-method=open}).
+\item[\lstinline{--arrow-polynomial}]\hfill\\
+  For each subchain, evaluate the arrow polynomial instead of Jones polynomial for knotoids (without \lstinline{--planar}) and loop arrow polynomial instead of Turaev loop bracket (with \lstinline{--planar}). This option is only relevant for open curves (\lstinline{--closure-method=open}).
 \item[\lstinline{--nb-moves-III=NMOVES}]\hfill\\
   Use \lstinline{NMOVES} iterations to simplify the knot(oid) diagram using Reidemeister move III\footnote{see section  ``\ref{sec:algorithms:diagramsimplication} \nameref{sec:algorithms:diagramsimplication}'' for more details.}.\\
   Default \lstinline{1000}.
@@ -169,7 +201,7 @@ Note that the knotted core corresponds to the "top-down" knotted core discussed 
     \item Options  \lstinline{--nb-projections} is ignored.                                  
   \end{itemize}
 \item[\lstinline{-n FILENAME}, \lstinline{--names-db=FILENAME}]\hfill\\
-  Load a list of polynomials with corresponding knot(oid) names from file \lstinline{FILENAME}\footnote{see section ``\ref{sec:format:namesdb} \nameref{sec:format:namesdb}'' for more information on the file format.}.
+  Load a list of polynomials with corresponding knot(oid) names from file \lstinline{FILENAME}\footnote{see section ``\ref{sec:format:namesdb} \nameref{sec:format:namesdb}'' for more information on the file format.}. If the special filename \lstinline{internal} is used, it loads the internal database instead. For knots, the internal database is based on the Rolfsen and Hoste-Thistlethwaite Knot tables while for knotoids it is based on the classification proposed in \cite{goundaroulis2019}\footnote{see also section ``\ref{sec:theory:notations} \nameref{sec:theory:notations}'' for more information on the knot(oid) naming convention.}.
 \item[\lstinline{--timeout=TIMEOUT}]\hfill\\
   Abort evaluation of polynomial invariant after \lstinline{TIMEOUT} seconds (integer number). Note: if the evaluation of the polynomial invariant is aborted, the polynomial is replaced by \lstinline{TIMEOUT}.
 \end{description}
@@ -660,13 +692,22 @@ Example of list of knot names:
 
 
 \subsubsection{\label{sec:format:polynomials}Polynomials}
-Polynomials are used both as input\footnote{section ``\ref{sec:format:namesdb} \nameref{sec:format:namesdb}''} and output\footnote{sections ``\ref{sec:format:multiprojection:jones} \nameref{sec:format:multiprojection:jones}'', ``\ref{sec:format:multiprojection:diagrams} \nameref{sec:format:multiprojection:diagrams}''.}.
+Polynomials are used both as input\footnote{section ``\ref{sec:format:namesdb} \nameref{sec:format:namesdb}''} and as output\footnote{sections ``\ref{sec:format:multiprojection:jones} \nameref{sec:format:multiprojection:jones}'', ``\ref{sec:format:multiprojection:diagrams} \nameref{sec:format:multiprojection:diagrams}''.}.
 
-Classical Jones polynomial and Jones polynomial for knotoids are univariate Laurent polynomials in variable $A$ with integer coefficients.
-Turaev loop bracket polynomial is a bivariate Laurent polynomial in variables $A$ and $v$ with integer coefficients. See section ``\ref{sec:theory:jones} \nameref{sec:theory:jones}'' for more details.
+The classical Jones polynomial and the Jones polynomial for knotoids are univariate Laurent polynomials in variable $A$ with integer coefficients.
+The Turaev loop bracket polynomial is a bivariate Laurent polynomial in variables $A$ and $v$ with integer coefficients.
+The arrow polynomial is a multivariate Laurent polynomial in variables $A$, $L_1, L_2,\cdots$ with integer coefficients.
+The loop arrow polynomial is a multivariate Laurent polynomial in variables $A$, $v$, $m_1,m_2,\cdots$, $w_1,w_2,\cdots$, $p_1,p_2,\cdots$ and  $q_1,q_2,\cdots$ with integer coefficients.
+See section ``\ref{sec:theory:jones} \nameref{sec:theory:jones}'' for more details on the polymial invariants.
 
-For the file format, we consider the more general case of bivariate Laurent polynomial with integer coefficients. It should be written as a sum of monomials:
-\[\sum_{n,m} C_{n,m}A^nv^m\text{ with }n,m,C_{n,m}\in\mathbb Z \]
+For the file format, we consider the more general case of multivariate Laurent polynomial with integer coefficients. For $m$ variables $\{X_1,X_2,\cdots,X_m\}$, it should be written as a sum of monomials:
+\[\sum_{n_1,n_2,\cdots,n_m} C_{n_1,n_2,\cdots,n_m}X_1^{n_1}X_2^{n_2}\cdots X_m^{n_m}\text{ with }C_{n,m},n_1,n_2,\cdots,n_m\in\mathbb Z \]
+Variable names must be written as:
+\begin{lstlisting}
+A, v, L1, L2, ..., m1, m2, ..., w1, w2, ..., p1, p2, ..., q1, q2, ...
+\end{lstlisting}
+
+
 Each monomial must be written using operators \lstinline{*} for multiplication and  \lstinline{^} for exponentiation:
 \begin{lstlisting}
 2*A^2*v^8
@@ -719,9 +760,12 @@ Examples of valid polynomials:
 \begin{lstlisting}
 +A^(-8) + A^(-6)*v^(-4) - A^(-2)*v
 \end{lstlisting}
-
-
-
+\begin{lstlisting}
++ A^(-8) - A^(-4) - A^(-2)*L1 + 1 + A^(2)*L1
+\end{lstlisting}
+\begin{lstlisting}
++ A^(4) + 2*A^(6)*m1 + A^(8)*p1
+\end{lstlisting}
   
 \subsubsection{\label{sec:format:listsubchains}List of subchains}
 Output format used by \lstinline{knotted_core} program to output the dominant knot(oid) of subchains of the input curve.

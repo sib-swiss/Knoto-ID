@@ -1,2 +1,2 @@
-#index_first	index_last	length	frequency	knotoid_type	polynomial
-8	160	153	0.5	UNKNOWN	 - A^(-16) + A^(-12) - A^(-8) - A^(-6)*v
+#index_first	index_last	length	frequency	polynomial
+104	151	48	0.416667	 - A^(-24) + A^(-20) - A^(-16) + 2*A^(-12) - A^(-8) + A^(-4)

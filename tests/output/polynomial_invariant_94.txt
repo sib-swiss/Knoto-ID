@@ -1,3 +1,2 @@
-#frequency	polynomial
-0.666667	 - A^(-16) + A^(-12) + A^(-4)
-0.333333	 - A^(-10) + A^(-6) + A^(-4)
+#frequency	knotoid_type	polynomial
+1	k0.1	 + 1

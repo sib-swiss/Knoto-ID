@@ -1,3 +1,2 @@
 #frequency	knotoid_type	polynomial
-0.833333	k3.1o	 - A^(-16) + A^(-12) + A^(-4)
-0.166667	UNKNOWN	 - A^(-16) + A^(-12) - A^(-8) - A^(-6)*v
+1	0_1	 + 1

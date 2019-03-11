@@ -1,1 +1,2 @@
-Polynomial:  + 1
+#frequency	knot_type	polynomial
+1	3_1R	 - A^(-16) + A^(-12) + A^(-4)

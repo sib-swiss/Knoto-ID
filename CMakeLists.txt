@@ -2,10 +2,9 @@ cmake_minimum_required(VERSION 2.8)
 project(KNOTOID)
 
 SET(KNOTOID_VERSION_MAJOR 1)
-SET(KNOTOID_VERSION_MINOR 2)
+SET(KNOTOID_VERSION_MINOR 3)
 SET(KNOTOID_VERSION_PATCH 0)
 
-configure_file (  "src/Version.h.in"  "${PROJECT_BINARY_DIR}/Version.h"  )
 
 #set STATIC_LINKING=TRUE to link to static libraries
 IF(STATIC_LINKING)

@@ -1,0 +1,2 @@
+Knotoid type: 3_15m	Polynomial:  + A^(-14)*v + A^(-12) - A^(-10)*v - A^(-8) + A^(-4)
+Knotoid type: 3_1m	Polynomial:  - A^(-16) + A^(-12) + A^(-4)

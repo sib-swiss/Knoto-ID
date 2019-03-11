@@ -24,7 +24,7 @@
 #include <cmath>
 #include <sstream>
 #include <boost/regex.hpp>
-
+#include <stdexcept>
 
 
 #ifndef ZERO
@@ -34,35 +34,44 @@
 //************************************************************
 //**********************   Polynomial   **********************
 //************************************************************
-//simple (and not efficient) class for bivariate Laurent polynomials with integer exponent
+//simple (and not efficient) class for multivariate Laurent polynomials with integer exponent
 class Polynomial
 {
 public:
-  Polynomial();//construct polynomial 0
-  void add(const Polynomial & p);
-  void add_monomial(double coefficient,long n,long m);//add coefficient*x^n*y^m
-  void multiply(const Polynomial & p);
-  void multiply_monomial(double coefficient,long n,long m);//multiply by coefficient*x^n*y^m
+  Polynomial();//Create polynomial 0
+  Polynomial(std::vector<std::string> var_names);//Create polynomial 0 with variables var_names
+  Polynomial(std::string string_polynomial,std::vector<std::string> var_names= std::vector<std::string>());//Create polynomial 0 and optionally specify variables var_names. Load polynomial from string. If var_names is specified and does not contain all variable appearing in string_polynomial => error
 
-  void set_variable_names(std::string var1,std::string var2){var1_name=var1;var2_name=var2;}
-  std::string get_variable1_name(){return var1_name;}
-  std::string get_variable2_name(){return var2_name;}
-  void clean();//remove coefficients=0
+  //the following function require p to have exaclty the same variable names (with same order), i.e. same var_names_to_index.
+  //if flag_force==false => don't check that variable names are the same (faster, but dangerous)
+  void add(const Polynomial & p,bool flag_force=false);
+  void add(double coefficient,std::string var="",long exponent=1);//add coefficient*var^exponent. If var=="" add only coefficient and ignore exponent
+  void multiply(const Polynomial & p,bool flag_force=false);
+  //not used// void multiply_monomial(double coefficient,long n,long m);//multiply by coefficient*x^n*y^m
 
-  const std::map<std::pair<long,long>,double> & get_coefficients()const {return coefficients;}
 
-  //load polygon from string. return true if success, false if failed.
-  //if var1="" and var2="" => variable names taken from input (arbitrary order)
-  bool load_from_string(std::string input,std::string var1="",std::string var2="");
-  std::string to_string();
+  std::vector<std::string> get_variable_names()const;
+
+  //load polygon from string (and replace current coefficients). return true if success, false if failed.
+  //if flag_keep_var_names=false => variable names (var_names_to_index) are erased and created from input (arbitrary order)
+  //if flag_keep_var_names=true => keep existing variable names (var_names_to_index) and error if it does not contain all variable appearing in input
+  //WARNING: if flag_keep_var_names=false => variable names (var_names_to_index) can change.
+  bool load_from_string(std::string input,bool flag_keep_var_names=false);
+  std::string to_string()const;
 
   friend std::ostream& operator<<(std::ostream& out, const Polynomial& p);
 
+  bool operator==(const Polynomial &p)const;
+  
 private:
-  //stored as sum_n,m coefficients(n,m) x^n y^m
-  std::map<std::pair<long,long>,double> coefficients;//coefficient(n,m)=coefficient[pair(n,m)]
-  std::string var1_name;//only for output
-  std::string var2_name;//only for output
+  void clean();//remove coefficients=0
+  int add_variable(std::string var_name);//add variable var_name and return its index. WARNING: computationally heavy. This will reorder all variables (change var_name_to_index), the coefficients map will have to be recreated.
+
+
+  
+  //stored as sum_n0,n1,n2,... coefficients(n0,n1,n2,...) x0^n0 x1^n1 x2^n2 x3^n3... 
+  std::map<std::vector<long>,double> coefficients;//coefficient(n,m)=coefficient[vector(n0,n1,n2,...)] with n0 the exponent for n0-th variable, n1 exponent for n1-th variable, ... with n-th variable var_name such that var_name_to_index[var_name]=n
+  std::map<std::string,int> var_names_to_index; //var_names_to_index[name]=n such that n-th variable is "name"
   
 };
 

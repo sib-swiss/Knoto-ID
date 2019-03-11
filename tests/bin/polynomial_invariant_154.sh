@@ -1,5 +1,5 @@
 #!/bin/bash
 set -eo pipefail
 sourcepath="$1"
-../src/polynomial_invariant --input-format=pd --nb-moves-III=100000 --output=polynomial_invariant_154.txt "${sourcepath}"/input/input_diagram_closed_1.txt || exit $? 
+../src//polynomial_invariant --arrow-polynomial --names-db="${sourcepath}"/input/input_knotoid_names.txt --projections-list="${sourcepath}"/input/input_projections.txt --input-format=xyz --closure-method=open --nb-moves-III=100000 --output=polynomial_invariant_154.txt "${sourcepath}"/input/input2.xyz || exit $? 
 diff polynomial_invariant_154.txt "${sourcepath}"/output/polynomial_invariant_154.txt || exit $?

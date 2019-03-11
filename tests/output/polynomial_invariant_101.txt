@@ -1,1 +1,3 @@
-Knotoid type: k3.1o	Polynomial:  - A^(-16) + A^(-12) + A^(-4)
+#frequency	knotoid_type	polynomial
+0.833333	0_1	 + 1
+0.166667	1_1	 - A^(2)*v - A^(4)

@@ -25,9 +25,9 @@ using namespace boost;
 //************************************************************
 //**********************   PolynomialInvariant   **********************
 //************************************************************
-PolynomialInvariant::PolynomialInvariant(PlanarDiagram & diagram_original,bool flag_planar,bool flag_debug):flag_planar(flag_planar),flag_debug(flag_debug),diagram(diagram_original)
+PolynomialInvariant::PolynomialInvariant(PlanarDiagram & diagram_original,bool flag_planar,bool flag_arrow_polynomial,bool flag_debug):flag_planar(flag_planar),flag_debug(flag_debug),diagram(diagram_original),flag_arrow_polynomial(flag_arrow_polynomial)
 {
-
+  
   //NOTE: region 1 corresponds to exterior, and is only used if flag_planar=true. Otherwise, region numbering starts at 2.
   //NOTE: crossings will be split in two ways (crossing_type): 0 or 1
   //
@@ -79,6 +79,8 @@ PolynomialInvariant::PolynomialInvariant(PlanarDiagram & diagram_original,bool f
   int r,ri,rj,d;
   region_endpoint1=-1;//endpoint 1 is in region region_endpoint1
   region_endpoint2=-1;//endpoint 2 is in region region_endpoint2
+  crossing_endpoint1=-1;//endpoint 1 is in region region_endpoint1
+  crossing_endpoint2=-1;//endpoint 2 is in region region_endpoint2
   vertex_descriptor vid,vid_i,vid_j;
   edge_descriptor eid;
   bool flag_found;
@@ -100,9 +102,15 @@ PolynomialInvariant::PolynomialInvariant(PlanarDiagram & diagram_original,bool f
       if(crossings[n].arc0>=0&&crossings[n].arc1<0&&crossings[n].arc2<0&&crossings[n].arc3<0)//endpoint => store region
 	{
 	  if(crossings[n].arc0==0)//first endpoint
-	    region_endpoint1=crossings[n].region01;
+	    {
+	      region_endpoint1=crossings[n].region01;
+	      crossing_endpoint1=n;
+	    }
 	  else
-	    region_endpoint2=crossings[n].region01;
+	    {
+	      region_endpoint2=crossings[n].region01;
+	      crossing_endpoint2=n;
+	    }
 	}
       //add nodes
       for(int i=0;i<4;i++)
@@ -201,7 +209,7 @@ PolynomialInvariant::PolynomialInvariant(PlanarDiagram & diagram_original,bool f
 	}
       else
 	{
-      cerr<<"ERROR PolynomialInvariant() found only one endpoint."<<endl;
+	  cerr<<"ERROR PolynomialInvariant() found only one endpoint."<<endl;
 	  exit(1);
 	}
     }
@@ -209,6 +217,60 @@ PolynomialInvariant::PolynomialInvariant(PlanarDiagram & diagram_original,bool f
   if(region_endpoint1>=0)
     flag_cyclic=false;
 
+  /////////////////////
+  //flag_cyclic=true, flag_planar=* flag_arrow_polynomial=*
+  // => classical jones
+  // => variables: A
+  //
+  //flag_cyclic=false, flag_planar=false flag_arrow_polynomial=false
+  // => jones for knotoids
+  // => variables: A
+  //
+  //flag_cyclic=false, flag_planar=true flag_arrow_polynomial=false
+  // => Turaev loop bracket for knotoids
+  // => variables: A,v
+  //
+  //flag_cyclic=false, flag_planar=false flag_arrow_polynomial=true
+  // => arrow polynomial for knotoids
+  // => variables: A, L1, L2, ... (L=lambda)
+  //
+  //flag_cyclic=false, flag_planar=true flag_arrow_polynomial=true
+  // => loop arrow polynomial for knotoids
+  // => variables: A,v,m1,m2,..,w1,w2,...,p1,p2,...,q1,q2,...
+
+  var_names.clear();
+  var_names.push_back("A");
+  if(!flag_cyclic)
+    {
+      if(flag_planar)
+	var_names.push_back("v");
+      if(flag_arrow_polynomial)
+	{
+	  int nb_arcs=diagram.get_nb_arcs();
+	  kinks.resize(nb_arcs);
+	  if(flag_planar)
+	    {
+	      for(int i=0;i<nb_arcs/2;i++)
+		{
+		  stringstream ss;
+		  ss<<i+1;
+		  var_names.push_back("m"+ss.str());
+		  var_names.push_back("w"+ss.str());	 
+		  var_names.push_back("p"+ss.str());
+		  var_names.push_back("q"+ss.str());	 
+		}
+	    }
+	  else
+	    {
+	      for(int i=0;i<nb_arcs/2;i++)
+		{
+		  stringstream ss;
+		  ss<<i+1;
+		  var_names.push_back("L"+ss.str());
+		}
+	    }
+	}
+    }
 
   /////////debug graph//////////
   if(flag_debug)
@@ -261,11 +323,15 @@ PolynomialInvariant::PolynomialInvariant(PlanarDiagram & diagram_original,bool f
 
 Polynomial PolynomialInvariant::get_polynomial_simple()
 {
+  if(flag_arrow_polynomial&&!flag_cyclic)
+    {
+      cerr<<"ERROR PolynomialInvariant::get_polynomial_simple(): not implemented for (loop) arrow polynomial"<<endl;
+      exit(1);
+    }
   if(diagram.get_nb_crossings(true)==0)
     {
-      Polynomial polynomial_jones;
-      polynomial_jones.set_variable_names("A","v");
-      polynomial_jones.add_monomial(1,0,0);
+      Polynomial polynomial_jones(var_names);
+      polynomial_jones.add(1);
       return polynomial_jones;
     }
   //we define a bit vector to store crossing types:
@@ -296,22 +362,14 @@ Polynomial PolynomialInvariant::get_polynomial_simple()
   //    
   
   ////////////loop over all combinations of crossing_type/////////////
-
-  Polynomial polynomial_jones;
-  polynomial_jones.set_variable_names("A","v");
-  Polynomial polynomial_A;//A
-  polynomial_A.add_monomial(1,1,0);
-  polynomial_A.set_variable_names("A","v");
-  Polynomial polynomial_A_inv;//A^-1
-  polynomial_A_inv.add_monomial(1,-1,0);
-  polynomial_A_inv.set_variable_names("A","v");
-  Polynomial polynomial_v;//v
-  polynomial_v.add_monomial(1,0,1);
-  polynomial_v.set_variable_names("A","v");
-  Polynomial polynomial_delta;//-A^2-A^-2
-  polynomial_delta.add_monomial(-1,2,0);
-  polynomial_delta.add_monomial(-1,-2,0);
-  polynomial_delta.set_variable_names("A","v");
+  Polynomial polynomial_jones(var_names);
+  Polynomial polynomial_A(var_names);//A
+  polynomial_A.add(1,"A");
+  Polynomial polynomial_A_inv(var_names);//A^-1
+  polynomial_A_inv.add(1,"A",-1);
+  Polynomial polynomial_delta(var_names);//-A^2-A^-2
+  polynomial_delta.add(-1,"A",2);
+  polynomial_delta.add(-1,"A",-2);
   vector<int> crossing_type(crossings.size());
   combination_first(crossing_type);
 
@@ -327,7 +385,7 @@ Polynomial PolynomialInvariant::get_polynomial_simple()
 	  time_t t_tot=time(NULL)-t0;
 	  if(timeout>0&&t_tot>timeout)
 	    {
-          throw runtime_error("PolynomialInvariant: Timeout.");
+	      throw runtime_error("PolynomialInvariant: Timeout.");
 	    }
 	  if(flag_cyclic)
 	    cerr<<"\r"<<"Polynomial "<<int(0.5+100*count_real*100.0/pow(2.0,(double)crossing_type.size()))/100.0<<" %"<<" elapsed time: "<<t_tot<<" s, remaining time: "<<lround(t_tot*pow(2.0,(double)crossing_type.size())/(double)count_real-t_tot)<<" s          ";
@@ -404,26 +462,30 @@ Polynomial PolynomialInvariant::get_polynomial_simple()
 	  else
 	    sigma-=1;
 	}
-      Polynomial tmp;
-      tmp.add_monomial(1,0,0);//1	    
+      Polynomial tmp(var_names);//1
+      tmp.add(1);//1	    
       //(-A^2-A^-2)^p
       for(int i=0;i<p;i++)//p always positive
-	tmp.multiply(polynomial_delta);
+	tmp.multiply(polynomial_delta,true);
       //multiply by v^q
-      for(int i=0;i<q;i++)//q always positive
-	tmp.multiply(polynomial_v);
+      if(q>0)
+	{
+	  Polynomial polynomial_vq(var_names);//v^q
+	  polynomial_vq.add(1,"v",q);
+	  tmp.multiply(polynomial_vq,true);
+	}
       //multiply by A^sigma
       if(sigma>0)
 	{
 	  for(int i=0;i<sigma;i++)
-	    tmp.multiply(polynomial_A);
+	    tmp.multiply(polynomial_A,true);
 	}
       else//sigma<0
 	{
 	  for(int i=0;i<-sigma;i++)
-	    tmp.multiply(polynomial_A_inv);
+	    tmp.multiply(polynomial_A_inv,true);
 	}
-      polynomial_jones.add(tmp);
+      polynomial_jones.add(tmp,true);
       if(flag_debug)
 	{
 	  cerr<<" Distance graph: shortest_path_length="<<shortest_path_length<<endl;
@@ -432,7 +494,6 @@ Polynomial PolynomialInvariant::get_polynomial_simple()
 	  cerr<<" q="<<q<<endl;
 	  cerr<<" p="<<p<<endl;
 	  cerr<<" sigma="<<sigma<<endl;
-	  tmp.set_variable_names("A","v");
 	  cerr<<" contribution to polynomial: "<<tmp<<endl;
 	}      
     }
@@ -446,17 +507,17 @@ Polynomial PolynomialInvariant::get_polynomial_simple()
   //multiply polynomial_jones by  (-A^3)^-writhe =(-A^-sign(writhe)*3)^|writhe|
   if(writhe>0)
     {
-      Polynomial tmp;
-      tmp.add_monomial(-1,-3,0);//-A^-3
+      Polynomial tmp(var_names);
+      tmp.add(-1,"A",-3);//-A^-3
       for(int i=0;i<writhe;i++)
-	polynomial_jones.multiply(tmp);
+	polynomial_jones.multiply(tmp,true);
     }
   else//writhe<0
     {
-      Polynomial tmp;      
-      tmp.add_monomial(-1,3,0);//-A^3
+      Polynomial tmp(var_names);      
+      tmp.add(-1,"A",3);//-A^3
       for(int i=0;i<-writhe;i++)
-	polynomial_jones.multiply(tmp);
+	polynomial_jones.multiply(tmp,true);
     }
   
 
@@ -475,16 +536,10 @@ Polynomial PolynomialInvariant::get_polynomial_simple()
 
 Polynomial PolynomialInvariant::get_polynomial_recursive(string method,bool flag_silent)
 {
-  if(flag_debug)
-    {
-      cerr<<"PolynomialInvariant::get_polynomial_recursive() constructor PD_code"<<endl;
-      diagram.save_to_file_list(cerr);
-    }
   if(diagram.get_nb_crossings(true)==0)
     {
-      Polynomial polynomial_jones;
-      polynomial_jones.set_variable_names("A","v");
-      polynomial_jones.add_monomial(1,0,0);
+      Polynomial polynomial_jones(var_names);
+      polynomial_jones.add(1);
       return polynomial_jones;
     }
 
@@ -504,8 +559,22 @@ Polynomial PolynomialInvariant::get_polynomial_recursive(string method,bool flag
   // crossing_type[n]=0,1 if crossings[n] is set to type 0 or 1.
   // Note: it is also defined for n corresponding to endpoints, but ignored.
 
-  
-  Polynomial polynomial_jones;
+  //For loop arrow polynomial, variable conventions
+  //
+  //     /\/ => m 
+  //
+  //     \/\ => w
+  //
+  //   /-----\
+  //   | /\/ | => p
+  //   \-----/
+  //
+  //   /-----\
+  //   | \/\ | => q
+  //   \-----/
+  //
+    
+  Polynomial polynomial_jones(var_names);
 
 
   set<int> remaining_crossings;
@@ -530,23 +599,16 @@ Polynomial PolynomialInvariant::get_polynomial_recursive(string method,bool flag
       else
 	cerr<<"fraction of evaluations done: "<<count_real*100.0/pow(2.0,(double)crossing_type.size()-2) <<"%"<<endl;
     }
+
   //evaluate writhe
   int writhe=diagram.get_writhe();
-  //multiply polynomial_jones by  (-A^3)^-writhe =(-A^-sign(writhe)*3)^|writhe|
-  if(writhe>0)
-    {
-      Polynomial tmp;
-      tmp.add_monomial(-1,-3,0);//-A^-3
-      for(int i=0;i<writhe;i++)
-	polynomial_jones.multiply(tmp);
-    }
-  else//writhe<0
-    {
-      Polynomial tmp;      
-      tmp.add_monomial(-1,3,0);//-A^3
-      for(int i=0;i<-writhe;i++)
-	polynomial_jones.multiply(tmp);
-    }
+  //multiply polynomial_jones by  (-A^3)^-writhe 
+  Polynomial tmp(var_names);
+  if(writhe%2==0)
+    tmp.add(1,"A",-3*writhe);//(-A^-3)^-writhe
+  else
+    tmp.add(-1,"A",-3*writhe);//(-A^-3)^-writhe
+  polynomial_jones.multiply(tmp,true);
   
   if(flag_debug)
     {
@@ -576,7 +638,7 @@ Polynomial PolynomialInvariant::jones_recursive(string method,vector<int> & cros
       time_t t_tot=time(NULL)-t0;
       if(timeout>0&&t_tot>timeout)
 	{
-      throw runtime_error("PolynomialInvariant: Timeout.");
+	  throw runtime_error("PolynomialInvariant: Timeout.");
 	}
       
       if(flag_cyclic)
@@ -603,9 +665,8 @@ Polynomial PolynomialInvariant::jones_recursive(string method,vector<int> & cros
     }
 
   vector<int> smoothed_crossings;//store crossings smoothed in this function call
-  Polynomial polynomial_result;
-  polynomial_result.set_variable_names("A","v");
-  Polynomial polynomial_tmp;
+  Polynomial polynomial_result(var_names);
+  Polynomial polynomial_tmp(var_names);
   int total_typeI_removal=0;//=(nb positive type I removal)-(nb negative type I removal) => to evaluate correction (-A^3)^total_typeI_removal to the jones polynomial
   vector<int> total_multiplicity;//total_multiplicity[r]=sum of multiplicity in region r. If regions r1 and r2 are merged, it will contain the same informatoin for both regions. Only used if method="region_order"
   vector<int> total_sign;//total_sign[r]=sum of sign in region r. only used if method="region_order"
@@ -1001,42 +1062,158 @@ Polynomial PolynomialInvariant::jones_recursive(string method,vector<int> & cros
       int p=nrings-q;//nb ring disjoints from the segment;
       if(flag_cyclic)
 	p=p-1;//
-      
 
-      polynomial_result.add_monomial(1,0,0);//1	    
-      //(-A^2-A^-2)^p
-      if(p>0)
+      int nb_kinks=-1;
+      if(flag_arrow_polynomial&&!flag_cyclic)
 	{
-	  Polynomial polynomial_delta;//-A^2-A^-2
-	  polynomial_delta.add_monomial(-1,2,0);
-	  polynomial_delta.add_monomial(-1,-2,0);
-	  for(int i=0;i<p;i++)//p always positive
-	    polynomial_result.multiply(polynomial_delta);
+	  //follow segment
+	  int n1=crossing_endpoint1,n2;
+	  int pos_in,pos_out=0;
+	  int orientation_in=0,orientation_out=0; //+1 or -1, 0 => not yet initialized
+	  int kink_direction=0; //+1 => left handed, -1 => right handed, 0 => not yet initialized
+	  while(true)
+	    {
+	      n2=crossings[n1].get_connected_crossing(pos_out);
+	      if(n2==crossing_endpoint2)
+		{
+		  //endpoint2 => oriented from n1 to n2
+		  orientation_out=+1;
+		  if(kink_direction!=0&&orientation_out!=orientation_in)
+		    {
+		      if(nb_kinks>=0&&kinks[nb_kinks]==kink_direction)//remove last kink from kinks and ignore current kink
+			{
+			  nb_kinks--;
+			}
+		      else//add kink to kinks
+			{
+			  nb_kinks++;
+			  kinks[nb_kinks]=kink_direction;
+			}
+		    }
+		  break;
+		}
+	      pos_in=-1;
+	      for(int i=0;i<4;i++)
+		if(crossings[n2].get_connected_crossing(i)==n1&&crossings[n2].get_arc(i)==crossings[n1].get_arc(pos_out)&&(!(n1==n2&&pos_out==i)))
+		  {
+		    pos_in=i;
+		    break;
+		  }
+	      if(pos_in<0)
+		{
+		  cerr<<"ERROR following segment "<<method<<endl;
+		  exit(1);		  
+		}
+	      //orientation
+	      if(crossings[n2].get_arc(pos_in)<crossings[n2].get_arc((pos_in+2)%4))//oriented from n1 to n2
+		{
+		  orientation_out=+1;
+		}
+	      else
+		{
+		  orientation_out=-1;
+		}
+	      if(kink_direction!=0&&orientation_out!=orientation_in)
+		{
+		  if(nb_kinks>=0&&kinks[nb_kinks]==kink_direction)//remove last kink from kinks and ignore current kink
+		    {
+		      nb_kinks--;
+		    }
+		  else//add kink to kinks
+		    {
+		      nb_kinks++;
+		      kinks[nb_kinks]=kink_direction;
+		    }
+		}
+	      if(crossing_type[n2]==0)
+		{
+		  if(pos_in==0){pos_out=1;kink_direction=-1;}
+		  else if(pos_in==1){pos_out=0;kink_direction=+1;}
+		  else if(pos_in==2){pos_out=3;kink_direction=-1;}
+		  else if(pos_in==3){pos_out=2;kink_direction=+1;}
+		}
+	      else if(crossing_type[n2]==1)
+		{
+		  if(pos_in==0){pos_out=3;kink_direction=+1;}
+		  else if(pos_in==1){pos_out=2;kink_direction=-1;}
+		  else if(pos_in==2){pos_out=1;kink_direction=+1;}
+		  else if(pos_in==3){pos_out=0;kink_direction=-1;}
+		}
+	      orientation_in=orientation_out;
+	      n1=n2;
+	    }
+	      
 	}
-      //multiply by v^q
-      if(q>0)
+      nb_kinks++;
+      if(flag_arrow_polynomial&&!flag_cyclic&&nb_kinks>0)
 	{
-	  Polynomial polynomial_v;//v
-	  polynomial_v.add_monomial(1,0,1);
-	  for(int i=0;i<q;i++)//q always positive
-	    polynomial_result.multiply(polynomial_v);
+	  stringstream k_str;
+	  k_str<<nb_kinks/2;
+
+	  polynomial_result.add(1);//1	    
+	  //(-A^2-A^-2)^p
+	  if(p>0)//p=nb rings disjoint from segment
+	    {
+	      Polynomial polynomial_delta(var_names);//-A^2-A^-2
+	      polynomial_delta.add(-1,"A",2);
+	      polynomial_delta.add(-1,"A",-2);
+	      for(int i=0;i<p;i++)//p always positive
+		polynomial_result.multiply(polynomial_delta,true);
+	    }
+	  //multiply by pk^q or qk^q
+	  if(q>0)//q=nb rings enclosing segment.  q>0 only with flag_planar
+	    {
+	      Polynomial polynomial_tmp(var_names);//var^q
+	      if(kinks[0]<0)
+		polynomial_tmp.add(1,"p"+k_str.str(),q);//WARNING: variables p1,p2,... not the same as p defined above
+	      else
+		polynomial_tmp.add(1,"q"+k_str.str(),q);//WARNING: variables p1,p2,... not the same as p defined above
+	      polynomial_result.multiply(polynomial_tmp,true);
+	    }
+	  else//multiply by Lk (if flag_planar=false) or mk or wk (if flag_planar=true)
+	    {
+	      Polynomial polynomial_tmp(var_names);//Lk
+	      if(flag_planar)
+		{
+		  if(kinks[0]<0)		  
+		    polynomial_tmp.add(1,"m"+k_str.str());
+		  else		    
+		    polynomial_tmp.add(1,"w"+k_str.str());
+		}
+	      else
+		{
+		  polynomial_tmp.add(1,"L"+k_str.str());
+		}
+	      polynomial_result.multiply(polynomial_tmp,true);
+	    }
 	}
+      else
+	{
+	  polynomial_result.add(1);//1	    
+	  //(-A^2-A^-2)^p
+	  if(p>0)//p=nb rings disjoint from segment
+	    {
+	      Polynomial polynomial_delta(var_names);//-A^2-A^-2
+	      polynomial_delta.add(-1,"A",2);
+	      polynomial_delta.add(-1,"A",-2);
+	      for(int i=0;i<p;i++)//p always positive
+		polynomial_result.multiply(polynomial_delta,true);
+	    }
+	  //multiply by v^q
+	  if(q>0)//q=nb rings enclosing segment
+	    {
+	      Polynomial polynomial_vq(var_names);//v^q
+	      polynomial_vq.add(1,"v",q);
+	      polynomial_result.multiply(polynomial_vq,true);
+	    }
+	}      
       //multiply by (-A^3)^total_typeI_removal
-      if(total_typeI_removal>0)
-	{
-	  Polynomial polynomial_A3;//-A^3
-	  polynomial_A3.add_monomial(-1,3,0);
-	  for(int i=0;i<total_typeI_removal;i++)
-	    polynomial_result.multiply(polynomial_A3);
-	}
-      else if(total_typeI_removal<0)
-	{
-	  Polynomial polynomial_A3;//-A^-3
-	  polynomial_A3.add_monomial(-1,-3,0);
-	  for(int i=0;i<-total_typeI_removal;i++)
-	    polynomial_result.multiply(polynomial_A3);
-	}
-      
+      Polynomial polynomial_A3(var_names);//(-A^3)^total_typeI_removal
+      if(total_typeI_removal%2==0)
+	polynomial_A3.add(1,"A",3*total_typeI_removal);
+      else
+	polynomial_A3.add(-1,"A",3*total_typeI_removal);
+      polynomial_result.multiply(polynomial_A3,true);
       if(flag_debug)
 	{
 	  cerr<<debug_spacer<<"| Distance graph: shortest_path_length="<<shortest_path_length<<endl;
@@ -1044,6 +1221,7 @@ Polynomial PolynomialInvariant::jones_recursive(string method,vector<int> & cros
 	  cerr<<debug_spacer<<"| nrings="<<nrings<<endl;
 	  cerr<<debug_spacer<<"| p="<<p<<endl;
 	  cerr<<debug_spacer<<"| q="<<q<<endl;
+	  cerr<<debug_spacer<<"| nb_kinks="<<nb_kinks<<" (for (loop) arrow polynomial)"<<endl;
 	  cerr<<debug_spacer<<"| contribution to jones polynomial: "<<polynomial_result<<endl;
 	}      
       if(flag_debug)
@@ -1189,41 +1367,32 @@ Polynomial PolynomialInvariant::jones_recursive(string method,vector<int> & cros
   n=(*it);
   remaining_crossings.erase(it);
   smoothed_crossings.push_back(n);
-  
+
   crossing_type[n]=0;
   //assign length to edge n in graph_region
   if(map_crossing_to_edge_1[n].second)
     graph_regions[map_crossing_to_edge_1[n].first].length=2*crossing_type[n];
   if(map_crossing_to_edge_2[n].second)
     graph_regions[map_crossing_to_edge_2[n].first].length=2-2*crossing_type[n];  
-  polynomial_result.add_monomial(1,1,0);//A
-  polynomial_result.multiply(jones_recursive(method,crossing_type,remaining_crossings,n));//A*jones_recursive(crossing_type=0)
+  polynomial_result.add(1,"A");//A^1
+  polynomial_result.multiply(jones_recursive(method,crossing_type,remaining_crossings,n),true);//A^s*jones_recursive(crossing_type=0)
   crossing_type[n]=1;
   //assign length to edge n in graph_region
   if(map_crossing_to_edge_1[n].second)
     graph_regions[map_crossing_to_edge_1[n].first].length=2*crossing_type[n];
   if(map_crossing_to_edge_2[n].second)
     graph_regions[map_crossing_to_edge_2[n].first].length=2-2*crossing_type[n];  
-  polynomial_tmp.add_monomial(1,-1,0);//A^-1      
-  polynomial_tmp.multiply(jones_recursive(method,crossing_type,remaining_crossings,n));//A^-1*jones_recursive(crossing_type=1)
+  polynomial_tmp.add(1,"A",-1);//A^-1     
+  polynomial_tmp.multiply(jones_recursive(method,crossing_type,remaining_crossings,n),true);//A^-1*jones_recursive(crossing_type=1)
 
-  polynomial_result.add(polynomial_tmp);//A*jones_recursive(crossing_type=0)+A^-1*jones_recursive(crossing_type=1)
+  polynomial_result.add(polynomial_tmp,true);//A^1*jones_recursive(crossing_type=0)+A^(-1)*jones_recursive(crossing_type=1)
   //multiply by (-A^3)^total_typeI_removal
-  if(total_typeI_removal>0)
-    {
-      Polynomial polynomial_A3;//-A^3
-      polynomial_A3.add_monomial(-1,3,0);
-      for(int i=0;i<total_typeI_removal;i++)
-	polynomial_result.multiply(polynomial_A3);
-    }
-  else if(total_typeI_removal<0)
-    {
-      Polynomial polynomial_A3;//-A^-3
-      polynomial_A3.add_monomial(-1,-3,0);
-      for(int i=0;i<-total_typeI_removal;i++)
-	polynomial_result.multiply(polynomial_A3);
-    }
-
+  Polynomial polynomial_A3(var_names);//(-A^3)^total_typeI_removal
+  if(total_typeI_removal%2==0)
+    polynomial_A3.add(1,"A",3*total_typeI_removal);
+  else
+    polynomial_A3.add(-1,"A",3*total_typeI_removal);
+  polynomial_result.multiply(polynomial_A3,true);
 
   //add back smoothed crossings to remaining_crossings
   for(int i=0;i<smoothed_crossings.size();i++)

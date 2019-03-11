@@ -32,6 +32,7 @@ bool flag_cyclic=false;//jones polynomial evaluation: flag_cyclic=true: knot, fl
 bool flag_3d_reduction=true;
 bool flag_simplify_diagram=true;
 bool flag_planar=false; //diagram is on the plane (not the sphere) 
+bool flag_arrow_polynomial=false; 
 long max_nb_random_moves_III=1000;
 long max_nb_unsuccessfull_random_moves_III=10;//max number of move without improvement.
 int nb_helper_beads_per_segment=0;// for hoomd debug output, add nb_helper_beads_per_segment per segments 
@@ -61,12 +62,16 @@ void display_usage(char **argv,bool flag_help_all=false){
   cerr<<"    by Tubiana et al. Prog. Theor. Phys. Suppl. 191, 192–204  (2011)."<<endl;
   cerr<<"  - To read from standard input, use FILENAME=\"stdin\" or \"-\"."<<endl;    
   cerr<<"  - Polynomial invariants:"<<endl;  
-  cerr<<"     - when --closure-method=open but without --planar:"<<endl;  
-  cerr<<"       Jones polynomial for knotoids (on the sphere)."<<endl;  
-  cerr<<"     - when --closure-method=open and using --planar:"<<endl;  
-  cerr<<"       Turaev loop bracket for knotoids (on the plane)."<<endl;  
-  cerr<<"     - when --closure-method=direct or rays:"<<endl;  
+  cerr<<"     - with: --closure-method=direct or rays:"<<endl;  
   cerr<<"       Classical Jones polynomial for knots."<<endl;  
+  cerr<<"     - with: --closure-method=open (without --planar nor --arrow-polynomial):"<<endl;  
+  cerr<<"       Jones polynomial for knotoids (on the sphere)."<<endl;  
+  cerr<<"     - with: --closure-method=open --planar (without --arrow-polynomial):"<<endl;  
+  cerr<<"       Turaev loop bracket for knotoids (on the plane)."<<endl;  
+  cerr<<"     - when --closure-method=open --arrow-polynomial (without --planar):"<<endl;  
+  cerr<<"       Arrow polynomial for knotoids (on the sphere)."<<endl;  
+  cerr<<"     - when --closure-method=open --arrow-polynomial --planar:"<<endl;  
+  cerr<<"       Loop arrow polynomial for knotoids (on the plane)."<<endl;  
   cerr<<"  - By default, the polynomial invariant is the Jones polynomial"<<endl;
   cerr<<"    for knotoids (open curve, knotoid diagram on a sphere)."<<endl;  
   cerr<<"  - By default, the number of iterations for simplification with"<<endl;
@@ -134,6 +139,11 @@ void display_usage(char **argv,bool flag_help_all=false){
   cerr<<"           the knot(oid) diagram on the surface of a sphere."<<endl;
   cerr<<"           This option is only relevant for open curves (--closure-method=open)."<<endl;
   cerr<<endl;
+  cerr<<"      --arrow-polynomial"<<endl;
+  cerr<<"           evaluate the arrow polynomial instead of Jones polynomial"<<endl;
+  cerr<<"           for knotoids and loop arrow polynomial instead of Turaev loop bracket."<<endl;
+  cerr<<"           This option is only relevant for open curves (--closure-method=open)."<<endl;
+  cerr<<endl;
   cerr<<"      --nb-moves-III=N"<<endl;  
   cerr<<"           max number of iterations for simplification with random Reidemeister"<<endl;
   cerr<<"           moves III (default="<<max_nb_random_moves_III<<")."<<endl;
@@ -171,6 +181,11 @@ void display_usage(char **argv,bool flag_help_all=false){
   cerr<<"            - tab separated with two columns."<<endl;
   cerr<<"            - column 1: knot/knotoid name."<<endl;
   cerr<<"            - column 2: polynomial."<<endl;
+  cerr<<"           If FILENAME=\"internal\": use internal database."<<endl;
+  cerr<<"           For knots, this database is based on the Rolfsen and Hoste-Thistlethwaite Knot"<<endl;
+  cerr<<"           tables, while for knotoids it is based on the classification proposed in:"<<endl;
+  cout<<"           D. Goundaroulis, J. Dorier and A. Stasiak, \"A systematic classification"<<endl;
+  cerr<<"           of knotoids on the plane and on the sphere\", arXiv:1902.07277 [math.GT]"<<endl;
   cerr<<endl;
   cerr<<"      --timeout=T"<<endl;  
   cerr<<"           Abort evaluation of polynomial invariant after T seconds (integer number)."<<endl;
@@ -232,7 +247,7 @@ int main(int argc, char **argv)
     { "cyclic-input", no_argument, NULL, 'C' },
     { "no-3D-reduction", no_argument, NULL, 2 },
     { "nb-moves-III", required_argument, NULL, 3 },
-    { "nb-unsuccessfull-moves-III", required_argument, NULL, 10 },
+    { "nb-unsuccessfull-moves-III", required_argument, NULL, 12 },
     { "no-diagram-simplification", no_argument, NULL, 4 },
     { "planar", no_argument, NULL, 'p' },
     { "nb-helper-beads", required_argument, NULL, 6 },
@@ -243,6 +258,7 @@ int main(int argc, char **argv)
     { "output-search", required_argument, NULL, 11 },
     { "timeout", required_argument, NULL, 1 },
     { "projections-list", required_argument, NULL, 5 },
+    { "arrow-polynomial", no_argument, NULL, 10 },
     { NULL, no_argument, NULL, 0 }
   };
   opt = getopt_long( argc, argv, optString, longOpts, &longIndex );
@@ -279,8 +295,9 @@ int main(int argc, char **argv)
       cout<<"If you use this software for a publication, please cite:"<<endl;
       cout<<"J. Dorier, D. Goundaroulis, F. Benedetti and A. Stasiak, \"Knoto-ID: a tool to study the entanglement of open protein chains using the concept of knotoids\", Bioinformatics 34, 3402-3404 (2018)."<<endl;
       cout<<endl;
-      cout<<"If you use the knotoid classification given in files"<<endl;
-      cout<<"examples/knotoid_names_sphere.txt or examples/knotoid_names_planar.txt,"<<endl;
+      cout<<"If you use the knotoid classification from the internal database (with --names-db=internal)"<<endl;
+      cout<<"or from files examples/knotoid_names_sphere.txt, examples/knotoid_names_planar.txt,"<<endl;
+      cout<<"examples/knotoid_names_sphere_arrow.txt or examples/knotoid_names_planar_arrow.txt"<<endl;
       cout<<"please cite:"<<endl;
       cout<<"D. Goundaroulis, J. Dorier and A. Stasiak, \"A systematic classification of knotoids on the plane and on the sphere\", arXiv:1902.07277 [math.GT]"<<endl;
       cout<<endl;
@@ -300,7 +317,7 @@ int main(int argc, char **argv)
     case 3:
       max_nb_random_moves_III=atol(optarg);
       break;
-    case 10:
+    case 12:
       max_nb_unsuccessfull_random_moves_III=atol(optarg);
       break;
     case 4:
@@ -323,6 +340,9 @@ int main(int argc, char **argv)
       exit(0);
     case 'm':
       closure_method = optarg;
+      break;
+    case 10:
+      flag_arrow_polynomial=true;
       break;
     case 11:
       output_filename_search = optarg;
@@ -397,17 +417,26 @@ int main(int argc, char **argv)
     }
 
   /////polynomial invariants
-  if((closure_method=="direct"||closure_method=="straight"))
+  if(closure_method!="open")//cyclic
     {
       cerr<<"polynomial invariant: classical Jones polynomial."<<endl;
     }
-  if((closure_method=="open"&&!flag_planar))
+  else//not cyclic
     {
-      cerr<<"polynomial invariant: Jones polynomial for knotoids."<<endl;
-    }
-  if((closure_method=="open"&&flag_planar))
-    {
-      cerr<<"polynomial invariant: Turaev loop bracket."<<endl;
+      if(flag_arrow_polynomial)
+	{
+	  if(!flag_planar)
+	    cerr<<"polynomial invariant: arrow polynomial for knotoids."<<endl;
+	  else
+	    cerr<<"polynomial invariant: loop arrow polynomial for planar knotoids."<<endl;
+	}
+      else
+	{
+	  if(!flag_planar)
+	    cerr<<"polynomial invariant: Jones polynomial for knotoids."<<endl;
+	  if(flag_planar)
+	    cerr<<"polynomial invariant: Turaev loop bracket."<<endl;
+	}
     }
   ///////////////////////////
   //Loading names data base
@@ -419,7 +448,33 @@ int main(int argc, char **argv)
       istream filein(cin.rdbuf());
       ifstream filein_tmp;
       map<string,string>::iterator it_map;
-      if(names_db_filename!="stdin"&&names_db_filename!="-")
+      if(names_db_filename=="internal")
+	{
+	  if(flag_cyclic)
+	    {
+	      filein.rdbuf(knot_names.rdbuf());
+	    }
+	  else
+	    {
+	      if(flag_planar==true&&flag_arrow_polynomial==true)
+		{
+		  filein.rdbuf(knotoid_names_planar_arrow.rdbuf());
+		}
+	      else if(flag_planar==true&&flag_arrow_polynomial==false)
+		{
+		  filein.rdbuf(knotoid_names_planar.rdbuf());
+		}
+	      else if(flag_planar==false&&flag_arrow_polynomial==true)
+		{
+		  filein.rdbuf(knotoid_names_sphere_arrow.rdbuf());
+		}
+	      else if(flag_planar==false&&flag_arrow_polynomial==false)
+		{
+		  filein.rdbuf(knotoid_names_sphere.rdbuf());
+		}
+	    }
+	}
+      else if(names_db_filename!="stdin"&&names_db_filename!="-")
 	{
 	  filein_tmp.open(names_db_filename.c_str());
 	  filein.rdbuf(filein_tmp.rdbuf());
@@ -434,6 +489,7 @@ int main(int argc, char **argv)
       string line;
       long line_no=0;
       vector<string> name_jones_tmp;
+      const boost::regex validvariable("^(A|v|[Lmwpq][0-9]+)$");
       while (filein.good())
 	{
 	  line_no++;
@@ -442,7 +498,7 @@ int main(int argc, char **argv)
 	  if(name_jones_tmp.size()==2)
 	    {
 	      Polynomial p;
-	      if(!p.load_from_string(name_jones_tmp[1],"A","v"))
+	      if(!p.load_from_string(name_jones_tmp[1]))
 		{
 		  cerr<<"*********************************************************"<<endl;
 		  cerr<<"ERROR --names-db="<<names_db_filename<<endl;
@@ -450,16 +506,23 @@ int main(int argc, char **argv)
 		  cerr<<name_jones_tmp[1]<<endl;
 		  cerr<<"*********************************************************"<<endl;
 		  exit(1);
-		}
-	      if((p.get_variable1_name()!="A"&&p.get_variable1_name()!="v"&&p.get_variable1_name()!="")
-		 ||(p.get_variable2_name()!="A"&&p.get_variable2_name()!="v"&&p.get_variable2_name()!=""))
+		}		    
+	      //check variable names
+	      vector<string> var_names=p.get_variable_names();
+	      for(int i=0;i<var_names.size();i++)
 		{
-		  cerr<<"*********************************************************"<<endl;
-		  cerr<<"ERROR --names-db="<<names_db_filename<<" (line "<<line_no<<")"<<endl;
-		  cerr<<"Invalid polynomial (line "<<line_no<<"): Variable names should be \"A\" and \"v\"."<<endl;
-		  cerr<<name_jones_tmp[1]<<endl;
-		  cerr<<"*********************************************************"<<endl;
-		  exit(1);		  
+		  if(!regex_match(var_names[i],validvariable,boost::match_default))
+		    {
+		      cerr<<"*********************************************************"<<endl;
+		      cerr<<"ERROR --names-db="<<names_db_filename<<" (line "<<line_no<<")"<<endl;
+		      cerr<<"Invalid polynomial:"<<endl;
+		      cerr<<name_jones_tmp[1]<<endl;
+		      cerr<<"Invalid variable name \""<<var_names[i]<<"\". Variable names should be"<<endl;
+		      cerr<<" \"A\",\"v\",\"L1\",\"L2\",...,\"m1\",\"m2\",...,\"w1\",\"w2\",..."<<endl;
+		      cerr<<" \"p1\",\"p2\",...,\"q1\",\"q2\",..."<<endl;
+		      cerr<<"*********************************************************"<<endl;
+		      exit(1);		  
+		    }
 		}
 	      it_map=map_jones_to_name.find(p.to_string());
 	      if(it_map== map_jones_to_name.end())
@@ -481,7 +544,7 @@ int main(int argc, char **argv)
 	    }
 	}
       
-      if(names_db_filename!="stdin"&&names_db_filename!="-")
+      if(names_db_filename!="stdin"&&names_db_filename!="-"&&names_db_filename!="internal")
 	filein_tmp.close();
 
       //add special cases
@@ -1008,7 +1071,7 @@ string get_jones(Polygon & polygon,double & frequ,unsigned long nb_projections,s
 		}
 	    }
 	  //////////evaluate jones//////////////
-	  PolynomialInvariant jones(diagram,flag_planar,flag_debug);
+	  PolynomialInvariant jones(diagram,flag_planar,flag_arrow_polynomial,flag_debug);
 	  jones.set_timeout(timeout);
 	  Polynomial jones_polynomial;      
 	  /////////////jone bgl

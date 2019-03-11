@@ -1,1 +1,1 @@
-Polynomial:  + 1
+Knotoid type: 0_1	Polynomial:  + 1

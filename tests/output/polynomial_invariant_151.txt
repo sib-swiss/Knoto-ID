@@ -1,1 +1,1 @@
-Knot type: k0.1	Polynomial:  + 1
+Knotoid type: k3.1o-	Polynomial:  + A^(4) + A^(12) - A^(16)

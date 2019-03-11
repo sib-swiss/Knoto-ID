@@ -1,0 +1,2 @@
+#frequency	knotoid_type	polynomial
+1	3_1m	 - A^(-16) + A^(-12) + A^(-4)

@@ -1,0 +1,6 @@
+#frequency	knotoid_type	polynomial
+0.666667	UNKNOWN	 - A^(-16) + A^(-12) - A^(-8) - A^(-6)*v
+0.0833333	UNKNOWN	 - A^(-12) - A^(-10)*w1 - A^(-10)*v - A^(-8) + A^(-6)*w1 + A^(-4)
+0.0833333	UNKNOWN	 - A^(-12) - A^(-10)*v - A^(-10)*m1 - A^(-8) + A^(-6)*m1 + A^(-4)
+0.0833333	UNKNOWN	 - A^(-10)*w1 + A^(-6)*w1 + A^(-4)
+0.0833333	UNKNOWN	 - A^(-10)*m1 + A^(-6)*m1 + A^(-4)

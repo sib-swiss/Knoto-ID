@@ -20,9 +20,11 @@ J. Dorier, D. Goundaroulis, F. Benedetti and A. Stasiak, "Knoto-ID: a
 tool to study the entanglement of open protein chains using the
 concept of knotoids", Bioinformatics 34, 3402-3404 (2018).
 
-If you use the knotoid classification given in files
-`examples/knotoid_names_sphere.txt` or `examples/knotoid_names_planar.txt`,
-please cite:
+If you use the knotoid classification from the internal database
+(using `--names-db=internal`) or from files
+`examples/knotoid_names_sphere.txt`, `examples/knotoid_names_planar.txt`,
+`examples/knotoid_names_sphere_arrow.txt`,
+`examples/knotoid_names_planar_arrow.txt`, please cite:
 
 D. Goundaroulis, J. Dorier and A. Stasiak, "A systematic
 classification of knotoids on the plane and on the sphere",
@@ -31,7 +33,7 @@ arXiv:1902.07277 [math.GT].
 
 Precompiled binary distributions, with a user guide and examples, are
 available for Linux, Mac OS X and Windows at
-<http://www.vital-it.ch/software/Knoto-ID>.
+<https://github.com/sib-swiss/Knoto-ID/releases/latest>.
 
 ## Features
 
@@ -44,8 +46,11 @@ are:
   code format or PD code format.
 * Draw knot(oid) diagrams.
 * Evaluate the following polynomial invariant: classical Jones
-  polynomial for knots, Jones polynomial for knotoids and Turaev loop
-  bracket for planar knotoids.
+  polynomial for knots (closed curves), the Jones polynomial for
+  knotoids (open curves projected on a sphere), the Turaev loop
+  bracket for knotoids (open curves projected on a plane), the arrow
+  polynomial (open curves projected on a sphere) and the loop arrow
+  polynomial (open curves projected on a plane).
 * Evaluate polynomial invariant for multiple projection direction and
   produce projection maps on the plane of spherical coordinates or
   directly on a 3D globe (in interactive webGL format).

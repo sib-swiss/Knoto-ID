@@ -1,0 +1,2 @@
+Knot type: 11n_120m	Polynomial:  + A^(-12) - 3*A^(-8) + 5*A^(-4) - 6 + 8*A^(4) - 8*A^(8) + 7*A^(12) - 5*A^(16) + 3*A^(20) - A^(24)
+Knot type: 3_1	Polynomial:  + A^(4) + A^(12) - A^(16)

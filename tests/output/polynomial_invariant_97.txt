@@ -1,1 +1,1 @@
-Knotoid type: UNKNOWN	Polynomial:  - A^(-16) + A^(-12) - A^(-8) - A^(-6)*v
+Knotoid type: k0.1	Polynomial:  + 1

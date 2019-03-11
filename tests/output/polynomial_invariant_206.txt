@@ -1,0 +1,1 @@
+Knotoid type: 3_16m	Polynomial:  - A^(-16) + A^(-12) - A^(-8) - A^(-6)*v

@@ -1,2 +1,2 @@
-#frequency	polynomial
-1	 - A^(-24) + A^(-20) - A^(-16) + 2*A^(-12) - A^(-8) + A^(-4)
+#frequency	knotoid_type	polynomial
+1	k0.1	 + 1

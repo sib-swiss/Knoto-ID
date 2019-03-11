@@ -1,1 +1,1 @@
-Knot type: k0.1	Polynomial:  + 1
+Knotoid type: UNKNOWN	Polynomial:  + A^(2) + A^(4) - 2*A^(6) - 2*A^(8) + 3*A^(10) + 5*A^(12) - 2*A^(14) - 6*A^(16) - A^(18) + 4*A^(20) + 2*A^(22) - A^(24) - A^(26)

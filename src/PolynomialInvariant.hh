@@ -46,11 +46,12 @@ class PolynomialInvariant
 {
 public:
   //empty diagram
-  PolynomialInvariant(PlanarDiagram & diagram,bool flag_planar,bool flag_debug=false);
+  //if flag_arrow_polynomial, evaluate (loop) arrow polynomial for open diagrams instead of Jones or Turaev polynomials for knotoids 
+  PolynomialInvariant(PlanarDiagram & diagram,bool flag_planar,bool flag_arrow_polynomial=false,bool flag_debug=false);
 
   void set_timeout(time_t t){timeout=t;}//timeout=0 => no timeout
   time_t get_timeout(){return timeout;}
-  Polynomial get_polynomial_simple();
+  Polynomial get_polynomial_simple();//not implemented for (loop) arrow polynomial (flag_arrow_polynomial=true)
   Polynomial get_polynomial_recursive(std::string method="default",bool flag_silent=false);//method=default, crossing_order, arc_order, region_order
 
 
@@ -93,14 +94,21 @@ private:
   };
   typedef boost::filtered_graph<graph_t, edge_predicate_zero_length> graph_t_zero_length;
 
-
   graph_t graph_regions;
   std::vector<std::pair<edge_descriptor,bool> > map_crossing_to_edge_1;  //map_crossing_to_edge_1[n]=pair<e1,flag1> such that if flag1==true => graph_regions[e1].length=2*crossing_type[n]
   std::vector<std::pair<edge_descriptor,bool> > map_crossing_to_edge_2;  //map_crossing_to_edge_2[n]=pair<e2,flag2> such that if flag2==true => graph_regions[e2].length=2-2*crossing_type[n]
   std::vector<vertex_descriptor> map_region_to_vertex;//map_region_to_vertex[r]=i => graph_regions[i].region=r
   int region_endpoint1;//endpoint 1 is in region region_endpoint1
   int region_endpoint2;//endpoint 2 is in region region_endpoint2
+  int crossing_endpoint1;//endpoint 1 is in region region_endpoint1
+  int crossing_endpoint2;//endpoint 2 is in region region_endpoint2
 
+  std::vector<std::string> var_names;//store variable names for the polynomials
+
+  bool flag_arrow_polynomial;
+  std::vector<int> kinks;//temporary vector for (loop) arrow polynomial, must be initialized with size=nb_arcs. Store the last kinks (ignoring consecutive kinks with same orientation
+
+  
   //debug, used with get_polynomial_recursive:
   int recursion_level;
   time_t t0;

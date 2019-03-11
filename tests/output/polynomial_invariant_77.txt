@@ -1,1 +1,2 @@
-Knotoid type: k5.8	Polynomial:  + A^(8) + A^(10) - 2*A^(14) + 2*A^(18) + A^(20) - A^(22) - A^(24)
+#frequency	knot_type	polynomial
+1	5_2m|11n_57|12n_475	 - A^(-24) + A^(-20) - A^(-16) + 2*A^(-12) - A^(-8) + A^(-4)

@@ -24,7 +24,7 @@ The program \lstinline{polynomial_invariant} is used to evaluate the polynomial 
 \begin{lstlisting}
 $ bin/polynomial_invariant --help
 \end{lstlisting}
-By default, the input curve is considered as open and the method of analysis is the knotoids approach. To evaluate the the polynomial invariant of the open curve given in the file \lstinline{examples/3_1m.xyz}\footnote{in xyz file format, see section ``\ref{sec:format:xyz} \nameref{sec:format:xyz}'' for more information on the file format.}:
+By default, the input curve is considered as open and the method of analysis is the knotoids approach. To evaluate the polynomial invariant of the open curve given in the file \lstinline{examples/3_1m.xyz}\footnote{in xyz file format, see section ``\ref{sec:format:xyz} \nameref{sec:format:xyz}'' for more information on the file format.}:
 \begin{lstlisting}
 $ bin/polynomial_invariant examples/3_1m.xyz
 \end{lstlisting}
@@ -55,6 +55,13 @@ The exact output may change depending on the seed used to initialize the random 
 $ bin/polynomial_invariant --projection="1,0,0" examples/3_1m.xyz
 \end{lstlisting}
 
+\paragraph{Knotoids on the sphere (arrow polynomial).}
+To use the arrow polynomial\cite{guka,dye2009} for knotoids instead of the Jones polynomial for knotoids, use option \lstinline{--arrow-polynomial}
+\begin{lstlisting}
+$ bin/polynomial_invariant --arrow-polynomial examples/3_1m.xyz
+\end{lstlisting}
+
+
 \paragraph{Knotoids on the plane (Turaev loop bracket).}
 By default, the polynomial invariant is evaluated after projecting the input curve on a sphere\footnote{see section ``\ref{sec:theory} \nameref{sec:theory}'' for more details.}. To project the curve onto a plane instead, use option \lstinline{--planar}. The polynomial invariant used in this case is the Turaev loop bracket polynomial:
 \begin{lstlisting}
@@ -64,6 +71,28 @@ The polynomial will be written to standard output:
 \begin{lstlisting}
 Polynomial:  - A^(-16) + A^(-12) - A^(-8) - A^(-6)*v
 \end{lstlisting}
+
+\paragraph{Knotoids on the plane (loop arrow polynomial).}
+To use the loop arrow polynomial\cite{gound2} for knotoids instead of the Turaev loop bracket polynomial, use option \lstinline{--arrow-polynomial}
+\begin{lstlisting}
+$ bin/polynomial_invariant --planar --arrow-polynomial examples/3_1m.xyz
+\end{lstlisting}
+
+\paragraph{Polynomial invariants (summary).}
+Depending on the combination of options selected, {\it Knoto-ID} will use one of the five polynomial invariants:
+\begin{itemize}
+\item With \lstinline{--closure-method=direct} or  \lstinline{--closure-method=rays}:\\
+  \emph{ Classical Jones polynomial for knots}.
+\item With \lstinline{--closure-method=open} (without \lstinline{--planar} nor \lstinline{--arrow-polynomial}):\\
+  \emph{Jones polynomial for knotoids} (on the sphere).
+\item With \lstinline{--closure-method=open} and  \lstinline{--planar} (without \lstinline{--arrow-polynomial}):\\
+  \emph{Turaev loop bracket polynomial for knotoids} (on the plane).
+\item With \lstinline{--closure-method=open} and \lstinline{--arrow-polynomial} (without \lstinline{--planar}):\\
+  \emph{Arrow polynomial for knotoids} (on the sphere).
+\item With \lstinline{--closure-method=open}, \lstinline{--planar} and \lstinline{--arrow-polynomial}:\\
+  \emph{Loop arrow polynomial for knotoids} (on the plane).
+\end{itemize}
+Please see section ``\ref{sec:theory:jones} \nameref{sec:theory:jones}'' for more information on the polynomial invariants.
 
 \paragraph{Knotoid diagram.}
 To evaluate the polynomial invariant, the input curve is first projected (on a sphere or on a plane) to obtain a knotoid diagram. To save this diagram, specify the output file using option \lstinline{--output-diagram}. To output to standard output instead, use the special filename ``stdout'': 
@@ -358,12 +387,16 @@ Note that the combination of the \lstinline{rays} closure method with multiple d
 All options discussed previously in the context of knotoids can also be used with knots, except \lstinline{--planar} which is ignored for closed curve.
 
 \subsubsection{Mapping polynomials to knot(oid) names.}
-The directory \lstinline{examples/} contains three files mapping polynomials to names\footnote{see section ``\ref{sec:format:namesdb} \nameref{sec:format:namesdb}'' for more information on the file format.}:
+The directory \lstinline{examples/} contains five files mapping polynomials to names\footnote{see section ``\ref{sec:format:namesdb} \nameref{sec:format:namesdb}'' for more information on the file format.}:
 \begin{itemize}
-\item File \lstinline{examples/knot_names.txt}\footnote{This file was created using "The Rolfsen Knot Table" from The Knot Atlas (\url{katlas.org}).} should be used with knots (\lstinline{--closure-method=direct} or \lstinline{rays}).
-\item File \lstinline{examples/knotoid_names_sphere.txt} should be used when working with knotoids on the sphere (\lstinline{--closure-method=open}, without option \lstinline{--planar}).
-\item File \lstinline{examples/knotoid_names_planar.txt} should be used when working with knotoids on the plane (\lstinline{--closure-method=open}, with option \lstinline{--planar}).
+\item File \lstinline{examples/knot_names.txt}\footnote{This file was created using the Rolfsen and Hoste-Thistlethwaite Knot tables from The Knot Atlas (\url{katlas.org}).} should be used with knots (\lstinline{--closure-method=direct} or \lstinline{rays}).
+\item File \lstinline{examples/knotoid_names_sphere.txt} contains knotoid names and corresponding Jones polynomials for knotoids on the sphere and should be used when working with knotoids on the sphere (\lstinline{--closure-method=open}, without option \lstinline{--planar}).
+\item File \lstinline{examples/knotoid_names_planar.txt}  contains knotoid names and corresponding Turaev loop bracket polynomials for knotoids and should be used when working with knotoids on the plane (\lstinline{--closure-method=open}, with option \lstinline{--planar}).
+\item File \lstinline{examples/knotoid_names_sphere_arrow.txt}  contains knotoid names and corresponding arrow polynomials and should be used when working with knotoids on the sphere with arrow polynomial (\lstinline{--closure-method=open}, \lstinline{--arrow-polynomial}c, without option \lstinline{--planar}).
+\item File \lstinline{examples/knotoid_names_planar_arrow.txt}  contains knotoid names and corresponding loop arrow polynomial and should be used when working with knotoids on the plane with loop arrow polynomial (\lstinline{--closure-method=open}, \lstinline{--arrow-polynomial}, with option \lstinline{--planar}).
 \end{itemize}
+Files \lstinline{examples/knotoid_names_sphere.txt} and \lstinline{examples/knotoid_names_sphere_arrow.txt} are based on an exhaustive classification of all knotoids on the sphere with up to 6 crossings, therefore if the polynomial invariant of a knotoid on the sphere does not appear in one of these files, the knotoid must have more than 6 crossings.
+Files \lstinline{examples/knotoid_names_planar.txt} and \lstinline{examples/knotoid_names_planar_arrow.txt} are based on an exhaustive classification of all knotoids on the plane with up to 5 crossings but also includes planar representatives of knot-type knotoids and of knotoids on the sphere with 6 crossings. While the classification is exhaustive for planar knotoids with up to 5 crossings, it is only a partial classification for planar knotoids with 6 crossings, therefore if the polynomial invariant of a knotoid on the plane does not appear in one of these files, the knotoid must have more than 5 crossings.
 More information on the knotoids classification can be found in \cite{goundaroulis2019}. These files can be loaded using the option  \lstinline{--names-db}.  When using \lstinline{--names-db} with knotoids on the sphere
 \begin{lstlisting}
 $ bin/polynomial_invariant --names-db=examples/knotoid_names_sphere.txt examples/3_1m.xyz
@@ -380,31 +413,61 @@ the standard output will have an additional field with ``Knotoid type'':
 \begin{lstlisting}
 Knotoid type: 3_16m    Polynomial:  - A^(-16) + A^(-12) - A^(-8) - A^(-6)*v
 \end{lstlisting}
-Note that in this case the result is not the knotoid 3\_1m but the knotoid 3\_16m. This means that the endpoints of the chain lie in the inner region of the diagram. However, when the same structure is analyzed as a knotoid on the sphere, the result is 3\_1m. This is something to be expected since these diagrams are equivalent on the sphere because one can go from 3\_16m to 3\_1m with topological manipulations of the diagrams. In other words, the subtlety of distinguishing the inner and outer regions of a diagram is a feature of the planar analysis (more information on the knotoids classification can be found in \cite{goundaroulis2019}). 
+Note that in this case the result is not the knotoid 3\_1m but the knotoid 3\_16m. This means that the endpoints of the chain lie in the inner region of the diagram. However, when the same structure is analyzed as a knotoid on the sphere, the result is 3\_1m. This is something to be expected since these diagrams are equivalent on the sphere because one can go from 3\_16m to 3\_1m with topological manipulations of the diagrams. In other words, the subtlety of distinguishing the inner and outer regions of a diagram is a feature of the planar analysis (more information on the knotoids classification can be found in section ``\ref{sec:theory:notations} \nameref{sec:theory:notations}'' and in \cite{goundaroulis2019}). 
 
-
-
-
-Similarly when using a closed curve (knot) and \lstinline{--names-db=examples/knot_names.txt}
+For knotoids on the sphere with arrow polynomial:
 \begin{lstlisting}
-$ bin/polynomial_invariant --closure-method=direct --names-db=examples/knot_names.txt examples/3_1m.xyz
+$ bin/polynomial_invariant --names-db=examples/knotoid_names_sphere_arrow.txt --arrow-polynomial \
+  examples/3_1m.xyz
+\end{lstlisting}
+For knotoids on the plane with loop arrow polynomial:
+\begin{lstlisting}
+$ bin/polynomial_invariant --names-db=examples/knotoid_names_planar_arrow.txt --planar \
+  --arrow-polynomial examples/3_1m.xyz
+\end{lstlisting}
+Finally,  when using a closed curve (knot) and \lstinline{--names-db=examples/knot_names.txt}
+\begin{lstlisting}
+$ bin/polynomial_invariant --names-db=examples/knot_names.txt --closure-method=direct examples/3_1m.xyz
 \end{lstlisting}
 The standard output will have an additional field with ``Knot type'':
 \begin{lstlisting}
 Knot type: 3_1m    Polynomial:  - A^(-16) + A^(-12) + A^(-4)
 \end{lstlisting}
+Manually choosing the correct file for each use case can be error prone. To simplify this process, the keyword \lstinline{internal} can be used instead of a filename. When using  \lstinline{--names-db=internal}, {\it Knoto-ID} uses an internal database of knot(oid) names, which contains the same information as the files  \lstinline{examples/knot_names.txt}, \lstinline{examples/knotoid_names_sphere.txt}, \lstinline{examples/knotoid_names_planar.txt},\\
+\lstinline{examples/knotoid_names_sphere_arrow.txt} and \lstinline{examples/knotoid_names_planar_arrow.txt}. 
+
+For knotoids on the sphere
+\begin{lstlisting}
+$ bin/polynomial_invariant --names-db=internal examples/3_1m.xyz
+\end{lstlisting}
+For knotoids on the plane
+\begin{lstlisting}
+$ bin/polynomial_invariant --names-db=internal --planar examples/3_1m.xyz
+\end{lstlisting}
+For knotoids on the sphere with arrow polynomial:
+\begin{lstlisting}
+$ bin/polynomial_invariant --names-db=internal --arrow-polynomial examples/3_1m.xyz
+\end{lstlisting}
+For knotoids on the plane with loop arrow polynomial:
+\begin{lstlisting}
+$ bin/polynomial_invariant --names-db=internal --planar --arrow-polynomial examples/3_1m.xyz
+\end{lstlisting}
+For knots
+\begin{lstlisting}
+$ bin/polynomial_invariant --names-db=internal --closure-method=direct examples/3_1m.xyz
+\end{lstlisting}
+
 
 
 The polynomial invariants used here are not complete invariants, meaning that some knot types are not distinguished. For example, 5\_2m has the same polynomial as 11n\_57 and 12n\_0475. Evaluating the classical Jones polynomial of \lstinline{examples/5_2m.xyz} using direct closure 
 \begin{lstlisting}
-$ bin/polynomial_invariant --names-db=examples/knot_names.txt examples/5_2m.xyz --closure-method=direct
+$ bin/polynomial_invariant --names-db=internal --closure-method=direct
 \end{lstlisting}
 will generate the following in the standard output
 \begin{lstlistingsmall}
 Knot type: 5_2m|11n_57|12n_475  Polynomial:  - A^(-24) + A^(-20) - A^(-16) + 2*A^(-12) - A^(-8) + A^(-4)
 \end{lstlistingsmall}
-which means that 5\_2m, 11n\_57 and 12n\_0475 were found with the same polynomial in the file\\
-\lstinline{examples/knot_names.txt}. In some cases, knowing the number of crossings in the diagram may help to determine the knot type. This information is given in standard error along with other information:
+which means that 5\_2m, 11n\_57 and 12n\_0475 have the same polynomial. In some cases, knowing the number of crossings in the diagram may help to determine the knot type. This information is given in standard error along with other information:
 \begin{lstlisting}
 seed: 1496327362
 polynomial invariant: classical Jones polynomial.
@@ -491,16 +554,17 @@ $ bin/knotted_core --closure-method=open --planar examples/3_1m_supercoiled.xyz
 \paragraph{Mapping polynomials to knot(oid) names.}
 As with \lstinline{polynomial_invariant}, option \lstinline{--names-db} can be used to load a file mapping polynomials to knot or knotoid names
 \begin{lstlisting}
-$ bin/knotted_core --names-db=examples/knotoid_names_sphere.txt examples/3_1m_supercoiled.xyz
+$ bin/knotted_core --names-db=internal examples/3_1m_supercoiled.xyz
 \end{lstlisting}
 The output contains an additional column \lstinline{knotoid_type} (or \lstinline{knot_type} if subchains are closed)
 \begin{lstlisting}
 #index_first  index_last  length  frequency  knotoid_type  polynomial
 23            52          30      0.55       3_1m          - A^(-16) + A^(-12) + A^(-4)
 \end{lstlisting}
-File \lstinline{examples/knotoid_names_sphere.txt} should be used with open subchains on the sphere \\
+When using the special filename \lstinline{internal}, {\it Knoto-ID} uses its internal database. It is also possible to specify an external file. The directory \lstinline{examples} contains five sample files mapping polynomials to knot or knotoid names:  File \lstinline{examples/knotoid_names_sphere.txt} should be used with open subchains on the sphere 
 (\lstinline{--closure-method=open} without \lstinline{--planar}, by default). For open subchains on the plane\\
-(\lstinline{--closure-method=open} with \lstinline{--planar}), file \lstinline{examples/knotoid_names_planar.txt} should be used. When working with closed subchains (\lstinline{--closure-method=direct} or \lstinline{rays}), use file \lstinline{examples/knot_names.txt} instead.
+(\lstinline{--closure-method=open} with \lstinline{--planar}), file \lstinline{examples/knotoid_names_planar.txt} should be used. Files  \lstinline{examples/knotoid_names_sphere_arrow.txt} and  \lstinline{examples/knotoid_names_planar_arrow.txt} should be used when working with arrow and loop arrow polynomials (with option \lstinline{--arrow-polynomial}).
+When working with closed subchains (\lstinline{--closure-method=direct} or \lstinline{rays}), use file \lstinline{examples/knot_names.txt} instead.
 
 \paragraph{Fingerprint matrices.}
 By default, \lstinline{knotted_core} outputs only the knotted core to the standard output. Option \lstinline{--output} can be used to save the knotted core to a file.
@@ -508,7 +572,7 @@ While searching for the knotted core, the program computes the dominant polynomi
 Finally, using option \lstinline{--output-all}, the dominant polynomial is computed for every subchain and saved to a file. 
 \begin{lstlisting}
 $ bin/knotted_core --output-all=all.txt --output-search=search.txt --output=knotted-core.txt \
-  --names-db=examples/knotoid_names_sphere.txt examples/3_1m_supercoiled.xyz
+  --names-db=internal examples/3_1m_supercoiled.xyz
 \end{lstlisting}
 The resulting files can then be used to produce a knotoid fingerprint matrix\cite{yeates, sulkowska2012, gound} using a simple {\ttfamily R} script\cite{r2017} included with {\it Knoto-ID} 
 \begin{lstlisting}
@@ -585,7 +649,7 @@ corresponds to the subchain with points $\{109,110,0,1,2,3\}$ of the input curve
 All options discussed when using open input curve can also be used with closed curve. In particular, the option \lstinline{--closure-method}, which defines how each subchain should be closed (or kept open), can be used independently from the choice of closure for the input curve (\lstinline{--cyclic-input}). For example, to evaluate the knotted core of the closed input curve \lstinline{examples/3_1m_supercoiled.xyz} based on the evaluation of the polynomial invariant of open subchains projected on the sphere (Jones polynomial for knotoids):
 \begin{lstlisting}
 $ bin/knotted_core --output-all=all.txt --output-search=search.txt --output=knotted-core.txt \
-  --names-db=examples/knotoid_names_sphere.txt --nb-projections=100 --cyclic-input \
+  --names-db=internal --nb-projections=100 --cyclic-input \
   examples/3_1m_supercoiled.xyz
 \end{lstlisting}
 The resulting knotted core is saved in the file \lstinline{knotted-core.txt}, while the dominant knotoid types of all possible subchains and of all subchains evaluated during the search are saved in files \lstinline{all.txt} and \lstinline{search.txt} respectively.
@@ -651,16 +715,16 @@ Polynomial:  - A^(-16) + A^(-12) + A^(-4)
 For the moment, we don't have any information on the knotoid type that corresponds to this polynomial. However, this can be solved easily by using the option \lstinline{--names-db} to specify a knotoid names database:
 \begin{lstlisting}
 $ bin/polynomial_invariant --projection="-0.443782,-0.690045,-0.571748" \
-  --names-db=examples/knotoid_names_sphere.txt examples/3KZN_chain_A.xyz
+  --names-db=internal examples/3KZN_chain_A.xyz
 \end{lstlisting}
-We have used the option \lstinline{--projection} in order to use a fixed projection for our chain. In particular, we used the projection that was randomly chosen in the previous run. The option \lstinline{--names-db=examples/knotoid_names_sphere.txt} allows the loading of the knotoids names database for knotoids on the sphere\footnote{see section ``\ref{sec:format:namesdb} \nameref{sec:format:namesdb}'' for more information on the file format.}. The standard output now takes the following form:
+We have used the option \lstinline{--projection} in order to use a fixed projection for our chain. In particular, we used the projection that was randomly chosen in the previous run. The option \lstinline{--names-db=internal} allows the loading of the internal knot(oid)s names database. Instead of the keyword \lstinline{internal}, an external file specifying the mapping from polynomials to names can also be given\footnote{see section ``\ref{sec:format:namesdb} \nameref{sec:format:namesdb}'' for more information on the file format.}. The standard output now takes the following form:
 \begin{lstlisting}
 Knotoid type: 3_1m      Polynomial:  - A^(-16) + A^(-12) + A^(-4)
 \end{lstlisting}
 This means that this particular projection of the protein chain corresponds to a knot-type knotoid with 3 crossings. As mentioned in section ``\ref{sec:theory} \nameref{sec:theory}'', the chain is considered lying inside a large enough sphere. Each point of the sphere indicates a projection direction towards an oriented surface that lies outside the sphere that encloses the chain. There are two options for the oriented surface: a sphere, which is the default option and is the one that was used so far in this example, as well as the 2D plane. By adding the option \lstinline{--planar}, we evaluate the knotoid type of the protein chain using planar knotoids.
 \begin{lstlisting}
 $ bin/polynomial_invariant --projection="-0.443782,-0.690045,-0.571748" \
-  --names-db=examples/knotoid_names_planar.txt --planar examples/3KZN_chain_A.xyz
+  --names-db=internal --planar examples/3KZN_chain_A.xyz
 \end{lstlisting}
 In this case the knotoid type of the protein chain remains the same upon evaluation using planar knotoids. Indeed
 \begin{lstlisting}
@@ -668,17 +732,31 @@ Knotoid type: 3_1m      Polynomial:  - A^(-16) + A^(-12) + A^(-4)
 \end{lstlisting}
 Note that this is not the general case. There could be protein chains that have a planar knotoid type different from the knotoid type on the sphere.
 
+To evaluate the arrow polynomial for knotoids on the sphere instead of the Jones polynomial, use option\\
+\lstinline{--arrow-polynomial}:
+\begin{lstlisting}
+$ bin/polynomial_invariant --projection="-0.443782,-0.690045,-0.571748" \
+  --names-db=internal --arrow-polynomial examples/3KZN_chain_A.xyz
+\end{lstlisting}
+To evaluate the loop arrow polynomial for knotoids on the plane instead of the Turaev loop bracket polynomial, use option \lstinline{--arrow-polynomial} together with \lstinline{--planar}:
+\begin{lstlisting}
+$ bin/polynomial_invariant --projection="-0.443782,-0.690045,-0.571748" \
+  --names-db=internal --planar --arrow-polynomial examples/3KZN_chain_A.xyz
+\end{lstlisting}
+In this specific example, using arrow or loop arrow polynomial gives the same result as the Jones polynomial for knotoid and Turaev loop bracket polynomial.
+
+
 In the example runs that we presented so far, the results were just printed to standard output. By adding the option \lstinline{--output=FILENAME}, we can ask the program to print the results into a file. Moreover, by including \lstinline{--output-diagram=FILENAME} the program creates a separate file that contains the corresponding knotoid diagram in PD format\footnote{see section ``\ref{sec:format:pd} \nameref{sec:format:pd}'' for more information on the file format.}:
 \begin{lstlisting}
 $ bin/polynomial_invariant --projection="-0.443782,-0.690045,-0.571748" \
-  --names-db=examples/knotoid_names_planar.txt --planar --output-diagram=3KZN_diagram.txt \ 
+  --names-db=internal --planar --output-diagram=3KZN_diagram.txt \ 
   --output=3KZN_polynomial.txt examples/3KZN_chain_A.xyz
 \end{lstlisting}
 Note that option \lstinline{--output-diagram-format=gauss} can be used to output extended Gauss codes\footnote{see section ``\ref{sec:format:gauss} \nameref{sec:format:gauss}'' for more information on the file format.} instead of PD codes for the knotoid diagrams.
 
 Up until this point, we have dealt only with a single projection of the protein chain. In order to find the dominant knotoid type of a chain, we have to consider all of its projections and, subsequently, sample them in a uniform way. By adding the option \lstinline{--nb-projections=N} the program samples ${\rm N}$ random projections with uniform distribution on the surface of the sphere. Below we give an example with 100 random projections:
 \begin{lstlisting}
-$ bin/polynomial_invariant --nb-projections=100 --names-db=examples/knotoid_names_planar.txt \
+$ bin/polynomial_invariant --nb-projections=100 --names-db=internal \
   --planar examples/3KZN_chain_A.xyz
 \end{lstlisting}
 The standard output includes a histogram of frequency of appearance of knotoid types. The knotoid with the highest frequency of appearance is the dominant knotoid type of the chain:
@@ -699,17 +777,17 @@ The standard output includes a histogram of frequency of appearance of knotoid t
 0.01       5_81|5_81ms|5_316|5_316ms  - A^(-10) + A^(-6) - A^(-2) - A^(-2)*v - 1 - v - A^(2)
 0.01       2_5*3_1m                   + A^(-14)*v - 2*A^(-10)*v - A^(-8) + A^(-6)*v + A^(-4) - A^(-2)*v + A^(2...
 \end{lstlistingsmall}
-In this example, the dominant knotoid type for the protein 3KZN is the knot-type knotoid $3_1m$ with frequency of appearance 63\%. Note that the exact frequency may change depending on the 100 random projections chosen. If multiple knotoid types have the same polynomial invariant\footnote{in the knotoid names database specified with \lstinline{--names-db}.}, all knotoid types are concatenated with a \lstinline{|} separator. \lstinline{UNKNOWN} corresponds to knotoids not found in the file \lstinline{examples/knotoid_names_planar.txt} (more than 5 crossings).
+In this example, the dominant knotoid type for the protein 3KZN is the knot-type knotoid $3_1m$ with frequency of appearance 63\%. Note that the exact frequency may change depending on the 100 random projections chosen. If multiple knotoid types have the same polynomial invariant\footnote{in the knotoid names database specified with \lstinline{--names-db}.}, all knotoid types are concatenated with a \lstinline{|} separator. \lstinline{UNKNOWN} corresponds to knotoids not found in the database (more than 5 crossings).
 
 We can also use a predetermined list of projections. In the following example we use the option \lstinline{--projections-list} in order to specify a list of 100 fixed projection directions uniformly distributed on the surface of a sphere, weighted by the surface of their corresponding Voronoi cells\footnote{see section ``\ref{sec:format:projections} \nameref{sec:format:projections}'' for a description of the file format.}. 
 \begin{lstlisting}
 $ bin/polynomial_invariant --projections-list=examples/projections_list_100.txt \
-  --names-db=examples/knotoid_names_planar.txt --planar examples/3KZN_chain_A.xyz
+  --names-db=internal --planar examples/3KZN_chain_A.xyz
 \end{lstlisting}
 
 Using option \lstinline{--output-diagram=diagrams.txt}, the list of projection directions with corresponding polynomials and knotoid types is saved to file \lstinline{diagrams.txt}. Although 100 projection can be sufficient to obtain a first approximation of the projection map, better results can be achieved using a larger number of projections:
 \begin{lstlisting}
-$ bin/polynomial_invariant --nb-projections=10000 --names-db=examples/knotoid_names_planar.txt \
+$ bin/polynomial_invariant --nb-projections=10000 --names-db=internal \
   --planar --output-diagram=diagrams.txt examples/3KZN_chain_A.xyz
 \end{lstlisting}
 The script \lstinline{plot_projection_map.R} can then be used to plot the projection map using voronoi tesselation:
@@ -738,10 +816,9 @@ A screenshot is shown in Figure~\ref{fig:3KZN:projectionmap:3D}.
 \subsubsection{Knots}
 In order to analyze an open protein chain using knots, one works in an analogous way. Since the protein chain is an open 3D curve, we have to specify what method should be used to close the curve. At the moment the program supports two closure methods: ``direct'' and ``rays''\footnote{more details on these methods can be found in section ``\ref{sec:theory:knotoidsandcurves} \nameref{sec:theory:knotoidsandcurves}''.}. These can be specified by adding the option \lstinline{--closure-method=direct} for the former and \lstinline{--closure-method=rays} for the latter.
 \begin{lstlisting}
-$ bin/polynomial_invariant --closure-method=rays --names-db=examples/knot_names.txt \
+$ bin/polynomial_invariant --closure-method=rays --names-db=internal \
   examples/3KZN_chain_A.xyz
 \end{lstlisting}
-Note that the file used for the knot names database (\lstinline{examples/knot_names.txt}\footnote{This file was created using "The Rolfsen Knot Table" from The Knot Atlas (\url{katlas.org}).}) is not the same as the file used for the knotoid names database (\lstinline{examples/knotoid_names_sphere.txt} and \lstinline{examples/knotoid_names_plane.txt}).
 
 The choice of projection directions can be specified with \lstinline{--nb-projections} or \lstinline{--projections-list} as discussed above. However, since the \lstinline{direct} closure (\lstinline{--closure-method=direct}) does not depend on the direction of projection, using multiple projections should only be used with \lstinline{--closure-method=rays}.
 
@@ -761,7 +838,7 @@ Each line corresponds to a possible knotted core. Here, two subchains have the s
 In analogy with the case explained above, we can specify the number of random projections that we want our sample to include (\lstinline{--nb-projections} or \lstinline{--projections-list}), the knot or knotoid names (\lstinline{--names-db}), the option of evaluating the diagrams on the plane (\lstinline{--planar}), the closure method (\lstinline{--closure-method}) and so on. For example, the following finds the knotted core of 3KZN using a set of predetermined projection directions and also loads the knotoid names database:
 \begin{lstlisting}
 $ bin/knotted_core --projections-list=examples/projections_list_100.txt \
-  --names-db=examples/knotoid_names_sphere.txt examples/3KZN_chain_A.xyz
+  --names-db=internal examples/3KZN_chain_A.xyz
 \end{lstlisting}
 When the option \lstinline{--names-db} is used, the output has an additional column with the knot(oid) type corresponding to the dominant polynomial invariant (here 3\_1m):
 \begin{lstlisting}
@@ -773,7 +850,7 @@ When the option \lstinline{--names-db} is used, the output has an additional col
 
 We proceed and ask \lstinline{knotted_core} to produce all data required to generate the fingerprint matrix of 3KZN (using options \lstinline{--output-all}, \lstinline{--output-search} and \lstinline{--output}). WARNING: evaluating all subchains (option \lstinline{--output-all}) can be very slow\footnote{On a MacBook Pro from 2011 with 2.4 GHz Intel Core i5 CPU, it takes approximately 15 minutes to execute this command.}.
 \begin{lstlisting}
-$ bin/knotted_core --names-db=examples/knotoid_names_sphere.txt \
+$ bin/knotted_core --names-db=internal \
   --output-all=3KZN_all.txt --output-search=3KZN_search.txt \
   --output=3KZN_knotted_core.txt --timeout=1 examples/3KZN_chain_A.xyz
 \end{lstlisting}
@@ -804,7 +881,7 @@ Obviously, increasing the number of projection not only increases the accuracy o
 
 Finally, we ask \lstinline{knotted_core} to produce the disk matrix of 3KZN. Since the endpoints of the chain are very close, there is no problem with connecting them with a straight line and to consider the input curve as circular (option \lstinline{--cyclic-input}). In addition, we ask \lstinline{knotted_core} to close each subchain with the \lstinline{rays} closure method\footnote{see section ``\ref{sec:theory:knotoidsandcurves} \nameref{sec:theory:knotoidsandcurves}'' for more details.}. Please note that the closure method for the input curve (option \lstinline{--cyclic-input}) and for the subchains (\lstinline{--closure-method}) can be chosen independently. WARNING: evaluating all subchains (option \lstinline{--output-all}) can be very slow\footnote{On a MacBook Pro from 2011 with 2.4 GHz Intel Core i5 CPU, it takes approximately 50 minutes to execute this command.}.
 \begin{lstlisting}
-$ bin/knotted_core --cyclic-input --closure-method=rays --names-db=examples/knot_names.txt \
+$ bin/knotted_core --cyclic-input --closure-method=rays --names-db=internal \
   --output-all=3KZN_all.txt --output-search=3KZN_search.txt \
   --output=3KZN_knotted_core.txt --timeout=1 examples/3KZN_chain_A.xyz
 \end{lstlisting}

@@ -1,0 +1,2 @@
+Knotoid type: k3.1o	Polynomial:  - A^(-16) + A^(-12) + A^(-4)
+Knotoid type: k5.2o	Polynomial:  - A^(-24) + A^(-20) - A^(-16) + 2*A^(-12) - A^(-8) + A^(-4)

@@ -1,4 +1,51 @@
 ====================================================================
+Knoto-ID v1.3.0
+====================================================================
+
+New features:
+
+* New polynomial invariants: arrow polynomial for knotoids on the
+  sphere and loop arrow polynomial for knotoids on the plane
+  (Goundaroulis et al. Polymers 9, 444 (2017)). New option
+  --arrow-polynomial (in knotted_core and polynomial_invariant) to use
+  these polynomial invariants.
+
+* Added file examples/knotoid_names_sphere_arrow.txt mapping arrow
+  polynomial to knotoid names and examples/knotoid_names_planar_arrow.txt
+  mapping loop arrow polynomials to knotoid names. File
+  examples/knotoid_names_sphere_arrow.txt is based on and exhaustive
+  classification of all knotoid diagrams on the sphere with up to 6
+  crossings.  File examples/knotoid_names_planar_arrow.txt is based on
+  and exhaustive classification of all knotoid diagrams on the plane
+  with up to 5 crossings but also includes planar representatives of
+  knot-type knotoids and of knotoids on the sphere with 6 crossings.
+  More details on the classification of knotoids used to generate
+  these files can be found in:
+  D. Goundaroulis, J. Dorier and A. Stasiak, "A systematic
+  classification of knotoids on the plane and on the sphere"
+  arXiv:1902.07277 [math.GT].
+
+* New option --names-db=internal to use an internal database mapping
+  polynomials to knot(oid) names instead of specifying an external
+  file. Note that this database contains exactly the same information
+  as the file examples/knot_names.txt, examples/knotoid_names_planar.txt,
+  examples/knotoid_names_planar_arrow.txt, examples/knotoid_names_sphere.txt
+  and examples/knotoid_names_sphere_arrow.txt.
+
+
+Changes:
+
+* File examples/knotoid_names_planar.txt: in addition to all knotoid
+  diagrams on the plane with up to 5 crossings, the classification now
+  also includes knot-type knotoids and knotoids on the sphere with 6
+  crossings.
+  More details on the classification of knotoids used to generate
+  these files can be found in:
+  D. Goundaroulis, J. Dorier and A. Stasiak, "A systematic
+  classification of knotoids on the plane and on the sphere"
+  arXiv:1902.07277 [math.GT].
+  
+====================================================================
 Knoto-ID v1.2.0
 ====================================================================
 
@@ -43,13 +90,14 @@ Changes:
 * Default --nb-moves-III set to 1000 for knotted_core (instead
   of 10).
 
+
 Bugs:
 
 * For all executables, also check Euler's formula (V-E+F=2) when
   testing validity of input diagrams.
 
 * Fixed a bug in script plot_projection_map.R that crashed when the
-  file specified with --curve-3D did not exist (i.e. amost always).
+  file specified with --curve-3D did not exist (i.e. almost always).
 
 ====================================================================
 Knoto-ID v1.1.1

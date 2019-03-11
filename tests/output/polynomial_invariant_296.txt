@@ -1,0 +1,1 @@
+Knotoid type: 3_2|3_2ms	Polynomial:  + A^(-8) - A^(-4) - A^(-2)*L1 + 1 + A^(2)*L1

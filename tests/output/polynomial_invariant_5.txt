@@ -1,1 +1,1 @@
-Knot type: 3_1L	Polynomial:  + A^(4) + A^(12) - A^(16)
+Knot type: 0_1	Polynomial:  + 1

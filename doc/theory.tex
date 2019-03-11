@@ -39,7 +39,7 @@ Two knots are equivalent, that is they can be deformed to one another, if and on
 \caption{Louis Kauffman's unknot. This rather complicated knot is actually equivalent to the trivial knot.}\label{fig:unknot}
 \end{figure}
 
- Such tools are the so-called knot invariants and are functions defined on the set of all knots and links that assign the same value to equivalent knots or links. In this work we focus on the Jones polynomial\cite{jones} and its extension to the case of equivalence classes of open ended diagrams called knotoids\cite{turaev,guka}.
+ Such tools are the so-called knot invariants and are functions defined on the set of all knots and links that assign the same value to equivalent knots or links. In this work we focus on the classical Jones polynomial for knots \cite{jones} and the various extensions of the Kauffman bracket polynomial \cite{kauffman1988} to the case of knotoids\cite{turaev,guka,gound2,goundaroulis2019}.
 
 \begin{figure}[h]
 \centering
@@ -104,8 +104,9 @@ There is however the option to close the open curve using an arc that directly c
 \end{figure}
 
 \subsection{\label{sec:theory:jones}Computing polynomial invariants}
-In this section we will present the Kauffman bracket\cite{kauffman1988} and how it gives rise to the classical Jones polynomial for knots\cite{jones}, the Jones polynomial for knotoids\cite{turaev,guka} and the Turaev loop bracket polynomial for planar knotoids\cite{turaev}. 
+In this section we will present the Kauffman bracket\cite{kauffman1988} and how it gives rise to the classical Jones polynomial for knots\cite{jones}, the Jones polynomial for knotoids\cite{turaev,guka} and the Turaev loop bracket polynomial for planar knotoids\cite{turaev}. Moreover, we present how we can obtain the arrow polynomial \cite{dye2009,guka} from the oriented extension of the Kauffman bracket. Finally, we give the planar extension of the arrow polynomial, the loop arrow polynomial \cite{gound2, goundaroulis2019}
 
+\subsubsection{\label{sec:theory:jones:classicaljones}Classical Jones polynomial for knots}
 Consider  a knot $K$ and observe that a each crossing \raisebox{-.1cm}{\begin{tikzpicture}[scale=.2]
 \draw [line width=0.35mm]  (-1,-1)-- (-0.22,-0.22);
 \draw  [line width=0.35mm ](-1,1)--(0,0);
@@ -163,6 +164,7 @@ f_K(A) = (-A^3)^{- {\rm wr}(K)} \langle K \rangle,
 \end{equation}
 where $\langle K \rangle$ is the Kauffman bracket polynomial of $K$. It turns out the $f_K(A)$ coincides with the classical Jones polynomial.
 
+\subsubsection{\label{sec:theory:jones:jonesknotoids}Jones polynomial for knotoids}
 One may extend the definition of the Kauffman bracket and, in turn of the classical Jones Polynomial, to the case of knotoids. The rules are more or less the same, with some minor tweaks depending on whether we want compute the invariant for a knotoid in $S^2$ or a planar knotoid. Knotoids are open ended diagrams and therefore when one smoothes all crossings of the diagram, in the end they will always end up with a number of disjoint circles and a single long segment. We choose the long segment to be the basis of the inductive procedure and so the axioms for a knotoid diagram $k$ become as follows:
 \begin{eqnarray}
 &&\langle \raisebox{-.1cm}{\begin{tikzpicture}[scale=.2]
@@ -193,23 +195,25 @@ The invariance unde the first Reidemeister move is taken care by the same normal
 J_k(A) = (-A^3)^{- {\rm wr}(k)} \langle k \rangle,
 \end{equation}
 
-where $\langle k \rangle$ is the Kauffman bracket polynomial of a knotoid diagram $k$ and ${\rm wr}(k)$ is the writhe of $k$. Equation~\ref{jonesknotoids} is the extension of the classical Jones for the case of knotoids in $S^2$. The case of planar knotoids requires some more explanation. As mentioned above when one smoothes all crossings of a knotoid diagram, they will end up with a number of disjoint circles and one long segment. When we work on the surface of a 2-sphere, it doesn't matter whether the long segment rests inside a circle or not because, even if it does, we can always take it out by moving an arc of the circle around the surface of the sphere. If we work with planar knotoids, we cannot do this and so we want to keep track of this information, i.e. if the long segments is inside a circle or not. For this reason, we add an extra variable to the Kauffman bracket polynomial that counts the number of circles that enclose the long segment in each possible smoothing of the knotoid diagram $k$.
+where $\langle k \rangle$ is the Kauffman bracket polynomial of a knotoid diagram $k$ and ${\rm wr}(k)$ is the writhe of $k$. Equation~\ref{jonesknotoids} is the extension of the classical Jones for the case of knotoids in $S^2$.
+\subsubsection{\label{sec:theory:jones:jonesknotoids}Turaev loop bracket polynomial for planar knotoids}
+The case of planar knotoids requires some more explanation. As mentioned above when one smoothes all crossings of a knotoid diagram, they will end up with a number of disjoint circles and one long segment. When we work on the surface of a 2-sphere, it doesn't matter whether the long segment rests inside a circle or not because, even if it does, we can always take it out by moving an arc of the circle around the surface of the sphere. If we work with planar knotoids, we cannot do this and so we want to keep track of this information, i.e. if the long segments is inside a circle or not. For this reason, we add an extra variable to the Kauffman bracket polynomial that counts the number of circles that enclose the long segment in each possible smoothing of the knotoid diagram $k$.
 
 \begin{eqnarray}
-&&\langle\langle \raisebox{-.1cm}{\begin{tikzpicture}[scale=.2]
+&&\langle \raisebox{-.1cm}{\begin{tikzpicture}[scale=.2]
 \draw [line width=0.35mm]  (-1,-1)-- (-0.22,-0.22);
 \draw  [line width=0.35mm ](-1,1)--(0,0);
 \draw  [line width=0.35mm] (0.22,0.22) -- (1,1);
 \draw [line width=0.35mm]   (0,0) -- +(1,-1);
-\end{tikzpicture}}\, \rangle \rangle=A \langle\langle \, \raisebox{-.07cm}{\begin{tikzpicture}[scale=.2]
+\end{tikzpicture}}\, \rangle_{\circ}=A \langle \, \raisebox{-.07cm}{\begin{tikzpicture}[scale=.2]
 \draw [line width=0.35mm] plot [smooth, tension=2] coordinates { (-1,.8) (0, 0.5) (1,.8)};
 \draw [ line width=0.35mm] plot [smooth, tension=2] coordinates { (-1,-.8) (0, -0.5) (1,-.8)};
-\end{tikzpicture}}\, \rangle\rangle   + A^{-1} \,\langle\langle\, \raisebox{-.1cm}{\begin{tikzpicture}[scale=.2]
+\end{tikzpicture}}\, \rangle_{\circ}   + A^{-1} \,\langle\, \raisebox{-.1cm}{\begin{tikzpicture}[scale=.2]
  \draw [ line width=0.35mm] plot [smooth, tension=2] coordinates { (-1,-1) (-0.3, 0) (-1,1)};
  \draw [ line width=0.35mm] plot [smooth, tension=2] coordinates { (1,-1) (0.3, 0) (1,1)};
- \end{tikzpicture}}\, \rangle\rangle \label{regbracket1} \\
-&&\langle\langle K \sqcup \bigcirc \rangle\rangle = \left (-A^2 - A^{-2}\right ) \langle\langle K \rangle\rangle \label{regbracket2}\\
-&&\langle \langle \ \begin{tikzpicture}[scale=.06,baseline]
+ \end{tikzpicture}}\, \rangle_{\circ} \label{regbracket1} \\
+&&\langle K \sqcup \bigcirc \rangle_{\circ} = \left (-A^2 - A^{-2}\right ) \langle K \rangle_{\circ} \label{regbracket2}\\
+&&\langle \ \begin{tikzpicture}[scale=.06,baseline]
         \draw (4,0) circle (5);
         \draw (4,0) circle (10.8);
          \draw[line width=0.35mm] 
@@ -221,25 +225,75 @@ where $\langle k \rangle$ is the Kauffman bracket polynomial of a knotoid diagra
 \draw[dotted] (0:10) -- node[below] {{\small $k$}} (0:13.5);
            \end{tikzpicture}
            \
-            \rangle\rangle = v^k \label{regbracket3}\\
-&&  \langle\langle \, \raisebox{.07cm}{\begin{tikzpicture}[scale=.1, baseline]
+            \rangle_{\circ} = v^k \label{regbracket3}\\
+&&  \langle \, \raisebox{.07cm}{\begin{tikzpicture}[scale=.1, baseline]
 \draw[line width=0.35mm] 
   (1,0) 
     .. controls (3,2) and (5,-2) .. 
   (7,0);  
 \draw[black,fill=black] (1,0) circle (2ex);
 \draw[black,fill=black] (7,0) circle (2ex);
-\end{tikzpicture}}\, \rangle\rangle  = 1 \label{regbracket4}
+\end{tikzpicture}}\, \rangle_{\circ}  = 1 \label{regbracket4}
 \end{eqnarray}
 
 This version of the bracket is a Laurent polynomial in $\mathbb{Z}[A,A^{-1},v]$. The invariance under the first Reidemeister move is given again by the same normalization:
 \begin{equation}\label{loopbracket}
-\widehat{J}_k(A, v) = (-A^3)^{- {\rm wr}(k)} \langle \langle k \rangle \rangle
+\widehat{J}_k(A, v) = (-A^3)^{- {\rm wr}(k)} \langle k \rangle_{\circ},
 \end{equation}
-Equation~\ref{loopbracket} comprises the Turaev loop bracket polynomial, which is the extension of the classical Jones polynomial to the case of planar knotoids.
+where $ \langle k \rangle_{\circ}$ is an evaluation of the diagram $k$ using the rules described above.  The Turaev loop bracket polynomial is  defined by the Equation~\ref{loopbracket} and is an extension of the classical Jones polynomial to the case of planar knotoids.
+
+\subsubsection{The arrow polynomial}
+
+The arrow polynomial is based on the oriented expansion of the bracket polynomial and it was initially  defined in \cite{dye2009} as an invariant for virtual knots. It is a Laurent polynomial in the ring $\mathbb{Z}[A^{\pm1}, L_1, L_2, \ldots ]$, where the $L_i$ are an infinite set of independent commuting variables that also commute with the
+Laurent polynomial variable $A$. The extension to classical knotoids in $S^2$ and virtual knotoids appeared in \cite{guka}. The skein relation in this case involves  smoothings with matching or conflicting orientations (see Eqs.~\ref{eq:arrow1} - \ref{eq:arrow5}).
+\begin{eqnarray}
+&&\raisebox{-0.5\height}{\includegraphics{arrow_skeinrelations_1}} \label{eq:arrow1}\\
+&&\raisebox{-0.5\height}{\includegraphics{arrow_skeinrelations_2}}\label{eq:arrow2}\\
+&&\raisebox{-0.5\height}{\includegraphics{arrow_skeinrelations_3}}\label{eq:arrow3}\\
+&&\raisebox{-0.5\height}{\includegraphics{arrow_skeinrelations_4}}\label{eq:arrow4}\\
+&&\raisebox{-0.5\height}{\includegraphics{arrow_skeinrelations_5}}\label{eq:arrow5}
+\end{eqnarray}
+
+
+ Note that each smoothing with a conflicting orientation results in a pair of cusps and, therefore, the set of axioms  for the recursive definition of the arrow polynomial \`{a} la bracket polynomial has to include rules that take into account these additional combinatorial structures. Each state includes a number of circular components and a long segment component, all of which may contain a number of consecutive cusps. A cancellation rule allows the simplification of two consecutive cusps into a straight arc, if the acute angles of both cusps are in the same local region of the diagram (see Fig.~\ref{fig:cancel}). The cancellation rule is not applicable to cases where the acute angles of two consecutive cusps are in different local regions of the diagram. 
+ The arrow polynomial assigns a new variable to each long segment of a state with a number of surviving cusps. In particular, two consecutive surviving cusps form a zigzag and a long segment with $2i$ surviving cusps is evaluated at $m_i$. The skein relation together with the axioms discussed above define recursively the arrow polynomial. The arrow polynomial becomes an ambient isotopy invariant under the following normalization:
+
+\begin{equation}\label{eq:arrow}
+\mathcal{A}(k) = \left( - A^3 \right )^{-{\rm wr}(k)} \left [ k  \right ],
+\end{equation}
+where $ \left [ k  \right ]$ is an evaluation of the diagram $k$ using the rules described above.
+ \begin{figure}[h] 
+\centering
+\includegraphics{figure_9}
+\caption{\footnotesize The allowed and the forbidden cancellation rules.}\label{fig:cancel}
+\end{figure}
+
+\subsubsection{The loop arrow polynomial}
+
+In analogy to the Turaev loop bracket, the loop arrow polynomial is the planar version of the arrow polynomial and it was mentioned first in \cite{gound2}. It is also a Laurent polynomial and it is lies in the ring 
+\[
+\mathbb{Z}[A^{\pm1}, v, m_1, m_2, \ldots, w_1, w_2, \ldots, p_1, p_2 \ldots, q_1, q_2, \ldots ],
+\] where the $m_i$, $w_j$, $p_k$, $q_\ell$ are infinite sets of independent commuting variables that also commute with the
+Laurent polynomial variables $A$ and $v$.  The loop arrow distinguishes two different types of zigzags (compare the zigzags in Eq.~\ref{eq:arrow4} to those in Eqs.~\ref{eq:loop_arrow1} and \ref{eq:loop_arrow2}) and it assigns one of the variables  $m_k$ or $w_i$, depending on the type of zigzag. Furthermore, much like the Turaev loop bracket, the loop arrow polynomial assigns different variables to circular components that enclose the long segment with or without any of the two types of zigzags. The loop arrow polynomial is defined by the rules of the arrow polynomial plus the additional rules in in Eqs.~\ref{eq:loop_arrow1}-\ref{eq:loop_arrow5}. 
+\begin{eqnarray}
+&&\raisebox{-0.5\height}{\includegraphics{loop_arrow_skeinrelations_1}}\label{eq:loop_arrow1}\\
+&&\raisebox{-0.5\height}{\includegraphics{loop_arrow_skeinrelations_2}}\label{eq:loop_arrow2}\\
+&&\raisebox{-0.5\height}{\includegraphics{loop_arrow_skeinrelations_3}}\label{eq:loop_arrow3}\\
+&&\raisebox{-0.5\height}{\includegraphics{loop_arrow_skeinrelations_4}}\label{eq:loop_arrow4}\\
+&&\raisebox{-0.5\height}{\includegraphics{loop_arrow_skeinrelations_5}}\label{eq:loop_arrow5}
+\end{eqnarray}
+
+Note that the type of zigzag that is evaluated at $m_k$ by the loop arrow polynomial while the arrow polynomial evaluates it at $L_k$. Since this is, in fact, the same rule and since what only changes is the variable that we use, we choose to use the variable $m_k$ when working with the loop arrow polynomial. Finally, as usual, the following normalization turns the loop arrow polynomial into an ambient isotopy invariant:
+
+\begin{equation}\label{eq:arrow}
+\widehat{\mathcal{A}}(k) = \left( - A^3 \right )^{-{\rm wr}(k)} \left [ k \right ]_{\circ},
+\end{equation}
+where $ \left [ k  \right ]_{\circ}$ is an evaluation of the diagram $k$ using the rules described above.
+
+
 
 \subsection{\label{sec:theory:notations}Notation Conventions}
-Knots have been tabulated in terms of number of crossings\cite{Rolfsen1976, Adams}. The standard notation is in the form $X_Y$ or $X\_ Y$, where $X$ is the number of crossings of the knot diagram in question and $Y$ corresponds to the position of the knot in the table among knots with the same number of crossings. For example, $5_2$ or $5\_2$ denotes the second knot in the knot table that has five crossings. An ``m'' is added at the end of a knot name when its mirror image is considered. The mirror image transforms a knot into a knot represented by the same diagrams with overpasses changed to underpasses and vice versa\cite{Adams}. For example $3_1^m$ or $3\_1m$ is the mirror image of the knot $3_1$. Additionally, we use * to denote the connected sum of two knots, for instance $3_1$*$5_2$ is the product between a $3_1$ and a $5_2$ knot.
+Knots have been tabulated in terms of number of crossings\cite{Rolfsen1976,Adams,dowker1983,hoste1998}. The standard notation is in the form $X_Y$ or $X\_ Y$, where $X$ is the number of crossings of the knot diagram in question and $Y$ corresponds to the position of the knot in the table among knots with the same number of crossings. For example, $5_2$ or $5\_2$ denotes the second knot in the knot table that has five crossings. An ``m'' is added at the end of a knot name when its mirror image is considered. The mirror image transforms a knot into a knot represented by the same diagrams with overpasses changed to underpasses and vice versa\cite{Adams}. For example $3_1^m$ or $3\_1m$ is the mirror image of the knot $3_1$. Additionally, we use * to denote the connected sum of two knots, for instance $3_1$*$5_2$ is the product between a $3_1$ and a $5_2$ knot.
 
 The same notation is also implemented for the case of knotoids. There are three symmetry related operations that can be applied on a knotoid diagram. First is the mirror reflection, the equivalent of the mirror image of a knot, that changes overpasses to underpasses and vice versa \cite{turaev}. The mirror image of a knotoid $K$ is denoted by $Km$ (Figure~\ref{fig:involutions} bottom-left). The second operation is the symmetric involution which corresponds to the two dimensional reflection. The symmetric of a knotoid $K$ is denoted by $Ks$ (Figure~\ref{fig:involutions} top-right). Finally, the mirror symmetric of a knotoid is the composition of the above two involutions and can be seen as a rotation by an angle $\pi$ around the axis that passes through the endpoints of the knotoid and it is denoted by $Kms$ (Figure~\ref{fig:involutions} bottom-right). For the product of two knotoids we use *, the same symbol with the connected sum of two knots. For instance, $2_1$*$3_1$ is the product between a $2_1$ and a $3_1$ knotoid.
 \begin{figure}[h]
@@ -249,7 +303,7 @@ The same notation is also implemented for the case of knotoids. There are three 
 \end{figure}
 
 
-A table with knotoids on the sphere with up to 5 crossings already exists\cite{bartholomew}. However, here\footnote{in files \lstinline{examples/knotoid_names_planar.txt} and \lstinline{examples/knotoid_names_sphere.txt}} we use a different table based on a complete classification of all knotoids on the plane with up to 5 crossings and of all knotoids on the sphere with up to 6 crossings (see \cite{goundaroulis2019} for more details).
+A table with knotoids on the sphere with up to 5 crossings already exists\cite{bartholomew}. However, here\footnote{when using internal database with \lstinline{--names-db=internal} or with files \lstinline{examples/knotoid_names_planar.txt}, \lstinline{examples/knotoid_names_sphere.txt}, \lstinline{examples/knotoid_names_planar_arrow.txt} or \lstinline{examples/knotoid_names_sphere_arrow.txt}} we use a different table based on a complete classification of all knotoids on the plane with up to 5 crossings and of all knotoids on the sphere with up to 6 crossings (see \cite{goundaroulis2019} for more details).
 
 \subsection{\label{sec:theory:knottedcore}Knotted proteins, slipknots and knotted cores}
 

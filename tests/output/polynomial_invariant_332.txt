@@ -1,0 +1,2 @@
+Knotoid type: 3_1m	Polynomial:  - A^(-16) + A^(-12) + A^(-4)
+Knotoid type: 5_2m	Polynomial:  - A^(-24) + A^(-20) - A^(-16) + 2*A^(-12) - A^(-8) + A^(-4)

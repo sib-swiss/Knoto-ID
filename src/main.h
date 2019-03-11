@@ -27,4 +27,6 @@
 #include <PolynomialInvariant.hh>
 #include <Version.h>
 #include <Random.hh>
+#include <KnotoidNames.hh>
+#include <boost/regex.hpp>
 

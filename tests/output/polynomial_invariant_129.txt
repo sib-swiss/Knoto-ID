@@ -1,1 +1,2 @@
-Knotoid type: k0.1	Polynomial:  + 1
+#frequency	polynomial
+1	 + 1

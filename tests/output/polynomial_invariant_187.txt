@@ -1,0 +1,1 @@
+Knotoid type: k3.1o	Polynomial:  - A^(-16) + A^(-12) + A^(-4)

@@ -1,1 +1,2 @@
-Knotoid type: k5.2o	Polynomial:  - A^(-24) + A^(-20) - A^(-16) + 2*A^(-12) - A^(-8) + A^(-4)
+#frequency	polynomial
+1	 + 1

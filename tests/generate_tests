@@ -9,7 +9,7 @@ function create_test {
     outputs=$(echo $cmdtmp|tr ' ' '\n'|grep -e "--output.*="|grep -v "stdout"|grep -v "format"|sed -e s@"[^=]*="@@) 
     echo "$cmdtmp"
     echo "$outputs"
-#    eval $cmdtmp || exit
+    eval $cmdtmp || exit
     scriptfilename=bin/${basename}_${count}.sh
     echo count=$count
     echo '#!/bin/bash' > $scriptfilename
@@ -32,7 +32,7 @@ for f in  input/*xyz; do
         for nbmovesIII in "100000";do
 	    xyz=`echo $RANDOM|awk 'function acos(x){return atan2(sqrt(1-x*x),x)};{srand($1);pi=3.14159265358979;u=rand();v=rand();theta=2*pi*u;phi=acos(2*v-1);dx=cos(theta)*sin(phi);dy=sin(theta)*sin(phi);dz=cos(phi);print dx","dy","dz}'`
             for projection in "--projection=${xyz}";do
-                for names in "" "--names-db=input/input_knot_names.txt";do
+                for names in "" "--names-db=input/input_knot_names.txt" "--names-db=internal";do
 		    if [[ ! -f output/polynomial_invariant_${count}.txt ]]; then
 			create_test "polynomial_invariant" "${exec_path}/polynomial_invariant ${names} ${projection} --input-format=xyz --closure-method=${closuremethod} --nb-moves-III=${nbmovesIII}  --output=output/polynomial_invariant_${count}.txt $f"
 			##diagrams change from one run to the other due to random simplification
@@ -50,7 +50,7 @@ for f in  input/*xyz; do
         for nbmovesIII in "100000";do
 	    xyz=`echo $RANDOM|awk 'function acos(x){return atan2(sqrt(1-x*x),x)};{srand($1);pi=3.14159265358979;u=rand();v=rand();theta=2*pi*u;phi=acos(2*v-1);dx=cos(theta)*sin(phi);dy=sin(theta)*sin(phi);dz=cos(phi);print dx","dy","dz}'`
             for projection in "--projection=${xyz}" "--projections-list=input/input_projections.txt";do
-                for names in "" "--names-db=input/input_knot_names.txt";do
+                for names in "" "--names-db=input/input_knot_names.txt" "--names-db=internal";do
 		    if [[ ! -f output/polynomial_invariant_${count}.txt ]]; then
 			create_test "polynomial_invariant" "${exec_path}/polynomial_invariant ${names} ${projection} --input-format=xyz --closure-method=${closuremethod} --nb-moves-III=${nbmovesIII}  --output=output/polynomial_invariant_${count}.txt $f"
 		    fi
@@ -61,18 +61,20 @@ for f in  input/*xyz; do
     done
 done
 
-#knotoids
+#knotoids (with/without --arrow-polynomial)
 for f in  input/*xyz; do
-    for planar in "" "--planar";do
-	for closuremethod in "open";do
-            for nbmovesIII in "100000";do
-		xyz=`echo $RANDOM|awk 'function acos(x){return atan2(sqrt(1-x*x),x)};{srand($1);pi=3.14159265358979;u=rand();v=rand();theta=2*pi*u;phi=acos(2*v-1);dx=cos(theta)*sin(phi);dy=sin(theta)*sin(phi);dz=cos(phi);print dx","dy","dz}'`
-		for projection in "--projection=${xyz}" "--projections-list=input/input_projections.txt";do
-                    for names in "" "--names-db=input/input_knotoid_names.txt";do
-			if [[ ! -f output/polynomial_invariant_${count}.txt ]]; then
-			    create_test "polynomial_invariant" "${exec_path}/polynomial_invariant ${planar} ${names} ${projection} --input-format=xyz --closure-method=${closuremethod} --nb-moves-III=${nbmovesIII}  --output=output/polynomial_invariant_${count}.txt $f"
-			fi
-		    count=$((count + 1))		    
+    for arrow in "" "--arrow-polynomial";do
+	for planar in "" "--planar";do
+	    for closuremethod in "open";do
+		for nbmovesIII in "100000";do
+		    xyz=`echo $RANDOM|awk 'function acos(x){return atan2(sqrt(1-x*x),x)};{srand($1);pi=3.14159265358979;u=rand();v=rand();theta=2*pi*u;phi=acos(2*v-1);dx=cos(theta)*sin(phi);dy=sin(theta)*sin(phi);dz=cos(phi);print dx","dy","dz}'`
+		    for projection in "--projection=${xyz}" "--projections-list=input/input_projections.txt";do
+			for names in "" "--names-db=input/input_knotoid_names.txt" "--names-db=internal";do
+			    if [[ ! -f output/polynomial_invariant_${count}.txt ]]; then
+				create_test "polynomial_invariant" "${exec_path}/polynomial_invariant ${planar} ${arrow} ${names} ${projection} --input-format=xyz --closure-method=${closuremethod} --nb-moves-III=${nbmovesIII}  --output=output/polynomial_invariant_${count}.txt $f"
+			    fi
+			    count=$((count + 1))		    
+			done
 		    done
 		done
 	    done
@@ -81,28 +83,32 @@ for f in  input/*xyz; do
 done
 
 
-#pd diagram open on the sphere
+#pd diagram open on the sphere (with/without --arrow-polynomial)
 for f in  input/input_diagram_open_sphere_*.txt; do
     for nbmovesIII in "100000";do
-	xyz=`echo $RANDOM|awk 'function acos(x){return atan2(sqrt(1-x*x),x)};{srand($1);pi=3.14159265358979;u=rand();v=rand();theta=2*pi*u;phi=acos(2*v-1);dx=cos(theta)*sin(phi);dy=sin(theta)*sin(phi);dz=cos(phi);print dx","dy","dz}'`
-        for names in "" "--names-db=input/input_knotoid_names.txt";do
-	    if [[ ! -f output/polynomial_invariant_${count}.txt ]]; then
-		create_test "polynomial_invariant" "${exec_path}/polynomial_invariant  ${names} --input-format=pd  --nb-moves-III=${nbmovesIII}  --output=output/polynomial_invariant_${count}.txt $f"
-	    fi
-	    count=$((count + 1))		    
+	for arrow in "" "--arrow-polynomial";do
+	    xyz=`echo $RANDOM|awk 'function acos(x){return atan2(sqrt(1-x*x),x)};{srand($1);pi=3.14159265358979;u=rand();v=rand();theta=2*pi*u;phi=acos(2*v-1);dx=cos(theta)*sin(phi);dy=sin(theta)*sin(phi);dz=cos(phi);print dx","dy","dz}'`
+            for names in "" "--names-db=input/input_knotoid_names.txt" "--names-db=internal";do
+		if [[ ! -f output/polynomial_invariant_${count}.txt ]]; then
+		    create_test "polynomial_invariant" "${exec_path}/polynomial_invariant  ${names} ${arrow} --input-format=pd  --nb-moves-III=${nbmovesIII}  --output=output/polynomial_invariant_${count}.txt $f"
+		fi
+		count=$((count + 1))		    
+	    done
 	done
     done
 done
 
-#pd diagram open on the plane
+#pd diagram open on the plane (with/without --arrow-polynomial)
 for f in  input/input_diagram_open_plane_*.txt; do
     for nbmovesIII in "100000";do
-	xyz=`echo $RANDOM|awk 'function acos(x){return atan2(sqrt(1-x*x),x)};{srand($1);pi=3.14159265358979;u=rand();v=rand();theta=2*pi*u;phi=acos(2*v-1);dx=cos(theta)*sin(phi);dy=sin(theta)*sin(phi);dz=cos(phi);print dx","dy","dz}'`
-        for names in "" "--names-db=input/input_knotoid_names.txt";do
-	    if [[ ! -f output/polynomial_invariant_${count}.txt ]]; then
-		create_test "polynomial_invariant" "${exec_path}/polynomial_invariant --planar  ${names} --input-format=pd  --nb-moves-III=${nbmovesIII}  --output=output/polynomial_invariant_${count}.txt $f"
-	    fi
-	    count=$((count + 1))		    
+	for arrow in "" "--arrow-polynomial";do
+	    xyz=`echo $RANDOM|awk 'function acos(x){return atan2(sqrt(1-x*x),x)};{srand($1);pi=3.14159265358979;u=rand();v=rand();theta=2*pi*u;phi=acos(2*v-1);dx=cos(theta)*sin(phi);dy=sin(theta)*sin(phi);dz=cos(phi);print dx","dy","dz}'`
+            for names in "" "--names-db=input/input_knotoid_names.txt" "--names-db=internal";do
+		if [[ ! -f output/polynomial_invariant_${count}.txt ]]; then
+		    create_test "polynomial_invariant" "${exec_path}/polynomial_invariant --planar  ${names} ${arrow} --input-format=pd  --nb-moves-III=${nbmovesIII}  --output=output/polynomial_invariant_${count}.txt $f"
+		fi
+		count=$((count + 1))		    
+	    done
 	done
     done
 done
@@ -111,7 +117,7 @@ done
 for f in  input/input_diagram_closed_*.txt; do
     for nbmovesIII in "100000";do
 	xyz=`echo $RANDOM|awk 'function acos(x){return atan2(sqrt(1-x*x),x)};{srand($1);pi=3.14159265358979;u=rand();v=rand();theta=2*pi*u;phi=acos(2*v-1);dx=cos(theta)*sin(phi);dy=sin(theta)*sin(phi);dz=cos(phi);print dx","dy","dz}'`
-        for names in "" "--names-db=input/input_knot_names.txt";do
+        for names in "" "--names-db=input/input_knot_names.txt" "--names-db=internal";do
 	    if [[ ! -f output/polynomial_invariant_${count}.txt ]]; then
 		create_test "polynomial_invariant" "${exec_path}/polynomial_invariant   ${names} --input-format=pd  --nb-moves-III=${nbmovesIII}  --output=output/polynomial_invariant_${count}.txt $f"
 	    fi
@@ -128,28 +134,32 @@ done
 
 
 
-#gauss code, diagram open on the sphere
+#gauss code, diagram open on the sphere (with/without --arrow-polynomial)
 for f in  input/input_diagram_gauss_open_sphere_*.txt; do
     for nbmovesIII in "100000";do
-	xyz=`echo $RANDOM|awk 'function acos(x){return atan2(sqrt(1-x*x),x)};{srand($1);pi=3.14159265358979;u=rand();v=rand();theta=2*pi*u;phi=acos(2*v-1);dx=cos(theta)*sin(phi);dy=sin(theta)*sin(phi);dz=cos(phi);print dx","dy","dz}'`
-        for names in "" "--names-db=input/input_knotoid_names.txt";do
-	    if [[ ! -f output/polynomial_invariant_${count}.txt ]]; then
-		create_test "polynomial_invariant" "${exec_path}/polynomial_invariant  ${names} --input-format=gauss  --nb-moves-III=${nbmovesIII}  --output=output/polynomial_invariant_${count}.txt $f"
-	    fi
-	    count=$((count + 1))		    
+	for arrow in "" "--arrow-polynomial";do
+	    xyz=`echo $RANDOM|awk 'function acos(x){return atan2(sqrt(1-x*x),x)};{srand($1);pi=3.14159265358979;u=rand();v=rand();theta=2*pi*u;phi=acos(2*v-1);dx=cos(theta)*sin(phi);dy=sin(theta)*sin(phi);dz=cos(phi);print dx","dy","dz}'`
+            for names in "" "--names-db=input/input_knotoid_names.txt" "--names-db=internal";do
+		if [[ ! -f output/polynomial_invariant_${count}.txt ]]; then
+		    create_test "polynomial_invariant" "${exec_path}/polynomial_invariant  ${names} ${arrow} --input-format=gauss  --nb-moves-III=${nbmovesIII}  --output=output/polynomial_invariant_${count}.txt $f"
+		fi
+		count=$((count + 1))		    
+	    done
 	done
     done
 done
 
-#gauss code,  diagram open on the plane
+#gauss code,  diagram open on the plane (with/without --arrow-polynomial)
 for f in  input/input_diagram_gauss_open_plane_*.txt; do
     for nbmovesIII in "100000";do
-	xyz=`echo $RANDOM|awk 'function acos(x){return atan2(sqrt(1-x*x),x)};{srand($1);pi=3.14159265358979;u=rand();v=rand();theta=2*pi*u;phi=acos(2*v-1);dx=cos(theta)*sin(phi);dy=sin(theta)*sin(phi);dz=cos(phi);print dx","dy","dz}'`
-        for names in "" "--names-db=input/input_knotoid_names.txt";do
-	    if [[ ! -f output/polynomial_invariant_${count}.txt ]]; then
-		create_test "polynomial_invariant" "${exec_path}/polynomial_invariant --planar  ${names} --input-format=gauss  --nb-moves-III=${nbmovesIII}  --output=output/polynomial_invariant_${count}.txt $f"
-	    fi
-	    count=$((count + 1))		    
+	for arrow in "" "--arrow-polynomial";do
+	    xyz=`echo $RANDOM|awk 'function acos(x){return atan2(sqrt(1-x*x),x)};{srand($1);pi=3.14159265358979;u=rand();v=rand();theta=2*pi*u;phi=acos(2*v-1);dx=cos(theta)*sin(phi);dy=sin(theta)*sin(phi);dz=cos(phi);print dx","dy","dz}'`
+            for names in "" "--names-db=input/input_knotoid_names.txt" "--names-db=internal";do
+		if [[ ! -f output/polynomial_invariant_${count}.txt ]]; then
+		    create_test "polynomial_invariant" "${exec_path}/polynomial_invariant --planar  ${names} ${arrow} --input-format=gauss  --nb-moves-III=${nbmovesIII}  --output=output/polynomial_invariant_${count}.txt $f"
+		fi
+		count=$((count + 1))		    
+	    done
 	done
     done
 done
@@ -158,7 +168,7 @@ done
 for f in  input/input_diagram_gauss_closed_*.txt; do
     for nbmovesIII in "100000";do
 	xyz=`echo $RANDOM|awk 'function acos(x){return atan2(sqrt(1-x*x),x)};{srand($1);pi=3.14159265358979;u=rand();v=rand();theta=2*pi*u;phi=acos(2*v-1);dx=cos(theta)*sin(phi);dy=sin(theta)*sin(phi);dz=cos(phi);print dx","dy","dz}'`
-        for names in "" "--names-db=input/input_knot_names.txt";do
+        for names in "" "--names-db=input/input_knot_names.txt" "--names-db=internal";do
 	    if [[ ! -f output/polynomial_invariant_${count}.txt ]]; then
 		create_test "polynomial_invariant" "${exec_path}/polynomial_invariant   ${names} --input-format=gauss --closure-method=direct  --nb-moves-III=${nbmovesIII}  --output=output/polynomial_invariant_${count}.txt $f"
 	    fi
@@ -177,7 +187,7 @@ inputs=( input/input0.xyz input/input1.xyz input/input4.xyz input/input5.xyz inp
 for f in "${inputs[@]}"; do 
     for cyclicinput in "" "--cyclic-input";do
 	for closuremethod in "direct";do
-	    for names in "" "--names-db=input/input_knot_names.txt";do
+	    for names in "" "--names-db=input/input_knot_names.txt" "--names-db=internal";do
 		if [[ ! -f output/knotted_core_${count}.txt ]]; then
 		    create_test "knotted_core" "${exec_path}/knotted_core ${names} ${cyclicinput} --closure-method=${closuremethod}  --output=output/knotted_core_${count}.txt --output-search=output/knotted_core_${count}_search.txt $f"
 		fi
@@ -192,7 +202,7 @@ done
 for f in "${inputs[@]}"; do 
     for cyclicinput in "" "--cyclic-input";do
 	for closuremethod in "rays";do
-            for names in "" "--names-db=input/input_knot_names.txt";do
+            for names in "" "--names-db=input/input_knot_names.txt" "--names-db=internal";do
 		if [[ ! -f output/knotted_core_${count}.txt ]]; then
 		    create_test "knotted_core" "${exec_path}/knotted_core ${names} ${cyclicinput} --projections-list=input/input_projections.txt --closure-method=${closuremethod}  --output=output/knotted_core_${count}.txt --output-search=output/knotted_core_${count}_search.txt $f"
 		fi
@@ -204,14 +214,16 @@ done
 
 #knotoids
 for f in "${inputs[@]}"; do 
-    for planar in "" "--planar";do
-	for cyclicinput in "" "--cyclic-input";do
-	    for closuremethod in "open";do
-		for names in "" "--names-db=input/input_knotoid_names.txt";do
-		    if [[ ! -f output/knotted_core_${count}.txt ]]; then
-			create_test "knotted_core" "${exec_path}/knotted_core ${planar} ${names} ${cyclicinput} --projections-list=input/input_projections.txt --closure-method=${closuremethod}  --output=output/knotted_core_${count}.txt --output-search=output/knotted_core_${count}_search.txt $f"
-		    fi
-		    count=$((count + 1))		    
+    for arrow in "" "--arrow-polynomial";do
+	for planar in "" "--planar";do
+	    for cyclicinput in "" "--cyclic-input";do
+		for closuremethod in "open";do
+		    for names in "" "--names-db=input/input_knotoid_names.txt" "--names-db=internal";do
+			if [[ ! -f output/knotted_core_${count}.txt ]]; then
+			    create_test "knotted_core" "${exec_path}/knotted_core ${planar} ${arrow} ${names} ${cyclicinput} --projections-list=input/input_projections.txt --closure-method=${closuremethod}  --output=output/knotted_core_${count}.txt --output-search=output/knotted_core_${count}_search.txt $f"
+			fi
+			count=$((count + 1))		    
+		    done
 		done
 	    done
 	done

@@ -1,1 +1,1 @@
-Polynomial:  + 1
+Polynomial:  - A^(-16) + A^(-12) + A^(-4)

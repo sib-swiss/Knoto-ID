@@ -1,0 +1,2 @@
+#index_first	index_last	length	frequency	polynomial
+96	165	70	0.5	 - A^(-16) + A^(-12) + A^(-4)

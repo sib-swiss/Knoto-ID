@@ -1,2 +1,2 @@
-#index_first	index_last	length	frequency	polynomial
-22	146	125	1	 - A^(-16) + A^(-12) + A^(-4)
+#index_first	index_last	length	frequency	knot_type	polynomial
+0	1	2	1	0_1	 + 1

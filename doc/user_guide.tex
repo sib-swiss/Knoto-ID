@@ -132,7 +132,7 @@ synthetic polymers, random walks, etc.
 
 {\it Knoto-ID} is a collection of command line tools with three executables (\lstinline{polynomial_invariant}, \lstinline{knotted_core} and  \lstinline{convert_diagram}) and five helper scripts (\lstinline{pdb_to_xyz.R}, \lstinline{plot_3D_curve.R}, \lstinline{plot_projection_map.R}, \lstinline{plot_knotted_core.R} and \lstinline{plot_diagram.R}):
 \begin{itemize}
-\item \lstinline{polynomial_invariant} computes the following polynomial invariants: classical Jones polynomial for knots (closed curves), Jones polynomial for knotoids (open curves projected on a sphere) and Turaev loop bracket for knotoids (open curves projected on a plane). \lstinline{polynomial_invariant} can output lists of polynomials obtained with multiple projection directions, which can be used to generate projection maps similar to those presented in\cite{gound}. A simple helper script \lstinline{plot_projection_map.R} is included with {\it Knoto-ID} to create such projection maps using the output of \lstinline{polynomial_invariant}.
+\item \lstinline{polynomial_invariant} computes the following polynomial invariants: the classical Jones polynomial for knots (closed curves), the Jones polynomial for knotoids (open curves projected on a sphere), the Turaev loop bracket for knotoids (open curves projected on a plane), the arrow polynomial (open curves projected on a sphere) and the loop arrow polynomial (open curves projected on a plane). \lstinline{polynomial_invariant} can output lists of polynomials obtained with multiple projection directions, which can be used to generate projection maps similar to those presented in\cite{gound}. A simple helper script \lstinline{plot_projection_map.R} is included with {\it Knoto-ID} to create such projection maps using the output of \lstinline{polynomial_invariant}.
 \item \lstinline{knotted_core} computes the knotted core of an open or closed curve. It can also be used to evaluate the dominant invariant polynomials for all subchains of the input curve. This data can be used to generate fingerprint matrices\cite{yeates, sulkowska2012, gound} (for open curves) or disk matrices\cite{rawdon} (for closed curves). A simple script \lstinline{plot_knotted_core.R} is included with {\it Knoto-ID} to create such fingerprint or disk matrices using the output produced by \lstinline{knotted_core}.
 \item \lstinline{convert_diagram} convert diagrams from/to PD codes, extended Gauss codes and piecewise linear curve (xyz). In particular, the xyz output format can be used to draw the diagram with the helper script \lstinline{plot_diagram.R} which is included with {\it Knoto-ID}.
 \item \lstinline{pdb_to_xyz.R} is a simple helper script to convert the backbone of proteins given in pdb format\cite{pdb} to piecewise linear curves in xyz format that can be used as input by {\it Knoto-ID}.
@@ -144,10 +144,13 @@ This document starts with a tutorial (section ``\ref{sec:tutorial} \nameref{sec:
 If you use this software for a publication, please cite:\\
 J. Dorier, D. Goundaroulis, F. Benedetti and A. Stasiak, "Knoto-ID: a tool to study the entanglement of open protein chains using the concept of knotoids", Bioinformatics 34(19):3402--3404, 2018.
 
-If you use the knotoid classification\footnote{files \lstinline{examples/knotoid_names_sphere.txt} or \lstinline{examples/knotoid_names_planar.txt}}, please cite:\\
+If you use the knotoid classification\footnote{using internal database with \lstinline{--names-db=internal} or files \lstinline{examples/knotoid_names_planar.txt}, \lstinline{examples/knotoid_names_sphere.txt}, \lstinline{examples/knotoid_names_planar_arrow.txt} or \lstinline{examples/knotoid_names_sphere_arrow.txt}}, please cite:\\
 D. Goundaroulis, J. Dorier and A. Stasiak, "A systematic classification of knotoids on the plane and on the sphere", arXiv:1902.07277 [math.GT].
 
 \subsection{Installation}
+The latest precompiled binary distribution is available for Linux, Mac OS X and Windows at
+\url{https://github.com/sib-swiss/Knoto-ID/releases/latest}
+
 Decompress Knoto-ID:
 \begin{lstlisting}
 $ tar -xf Knoto-ID-<version>.tar.gz 

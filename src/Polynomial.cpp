@@ -26,55 +26,389 @@ using namespace std;
 
 Polynomial::Polynomial()
 {
-  var1_name="x";
-  var2_name="y";  
 }
+
 //---------------------------------------------------------------------------
-void Polynomial::add(const Polynomial & p)
+
+Polynomial::Polynomial(vector<string> var_names)
 {
-  for(map<pair<long,long>,double>::const_iterator it=p.get_coefficients().begin();it!=p.get_coefficients().end();it++)
+
+  //order var_names
+  for(int i=0;i<var_names.size();i++)
+    var_names_to_index[var_names[i]]=0;
+  int index=0;
+  for(map<string,int>::iterator it=var_names_to_index.begin();it!=var_names_to_index.end();it++)
+    {
+      it->second=index;
+      index++;
+    }
+}
+
+//---------------------------------------------------------------------------
+
+Polynomial::Polynomial(string string_polynomial,vector<string> var_names)
+{  
+  //order var_names
+  for(int i=0;i<var_names.size();i++)
+    var_names_to_index[var_names[i]]=0;
+  int index=0;
+  for(map<string,int>::iterator it=var_names_to_index.begin();it!=var_names_to_index.end();it++)
+    {
+      it->second=index;
+      index++;
+    }
+  bool flag_keep_var_names=false;
+  if(var_names.size()>0)
+    flag_keep_var_names=true;
+    
+  if(!load_from_string(string_polynomial,flag_keep_var_names))
+    {
+      throw runtime_error("invalid polynomial \""+string_polynomial+"\"");
+    }
+}
+
+//---------------------------------------------------------------------------
+void Polynomial::add(const Polynomial & p,bool flag_force)
+{
+  if((!flag_force)&&var_names_to_index!=p.var_names_to_index)
+    {
+      cerr<<"ERROR Polynomial::add(): polynomial do not have the same variables."<<endl;
+      exit(1);
+    }
+  for(map<vector<long>,double>::const_iterator it=p.coefficients.begin();it!=p.coefficients.end();it++)
     {
       coefficients[it->first]+=it->second;
     }
   clean();
 }
 //---------------------------------------------------------------------------
-void Polynomial::add_monomial(double coefficient,long n,long m)
+void Polynomial::add(double coefficient,string var,long exponent)
 {
-  coefficients[pair<long,long>(n,m)]+=coefficient;
-  clean();
+  if(var=="")
+    {
+      vector<long> exps(var_names_to_index.size(),0);
+      coefficients[exps]+=coefficient;
+      clean();
+    }
+  else
+    {
+      map<string,int>::iterator it=var_names_to_index.find(var);
+      int index;
+      if(it==var_names_to_index.end())//does not exist, create variable
+	{
+	  cerr<<"ERROR: Polynomial::add() variable does not exist."<<endl;  //to catch errors with PolynomialInvariant. Could be removed
+	  exit(1); //to catch errors with PolynomialInvariant. Could be removed
+	  index=add_variable(var);
+	}
+      else
+	{
+	  index=it->second;
+	}
+      vector<long> exps(var_names_to_index.size(),0);
+      exps[index]=exponent;
+      coefficients[exps]+=coefficient;
+      clean();
+    }
 }
 //---------------------------------------------------------------------------
-void Polynomial::multiply(const Polynomial & p)
+void Polynomial::multiply(const Polynomial & p,bool flag_force)
 {
-  map<pair<long,long>,double> coefficients_tmp;//coefficient(n,m)=coefficient[pair(n,m)]
-  for(map<pair<long,long>,double>::iterator it1=coefficients.begin();it1!=coefficients.end();it1++)
+  if((!flag_force)&&var_names_to_index!=p.var_names_to_index)
     {
-      for(map<pair<long,long>,double>::const_iterator it2=p.get_coefficients().begin();it2!=p.get_coefficients().end();it2++)
+      cerr<<"ERROR Polynomial::multiply(): polynomial do not have the same variables."<<endl;
+      exit(1);
+    }
+  
+  map<vector<long>,double> coefficients_tmp;//coefficient(n,m)=coefficient[pair(n,m)]
+  vector<long> exponents(var_names_to_index.size(),0);
+  for(map<vector<long>,double>::iterator it1=coefficients.begin();it1!=coefficients.end();it1++)
+    {
+      for(map<vector<long>,double>::const_iterator it2=p.coefficients.begin();it2!=p.coefficients.end();it2++)
 	{
-	  coefficients_tmp[pair<long,long>(it1->first.first+it2->first.first,it1->first.second+it2->first.second)]+=it1->second*it2->second;
+	  for(int i=0;i<it1->first.size();i++)	    
+	    exponents[i]=it1->first[i]+it2->first[i];
+	  coefficients_tmp[exponents]+=it1->second*it2->second;
 	}
     }
   coefficients=coefficients_tmp;
   clean();
   
 }
+
 //---------------------------------------------------------------------------
-void Polynomial::multiply_monomial(double coefficient,long n,long m)
+vector<string> Polynomial::get_variable_names()const
 {
-  map<pair<long,long>,double> coefficients_tmp;//coefficient(n,m)=coefficient[pair(n,m)]
-  for(map<pair<long,long>,double>::iterator it1=coefficients.begin();it1!=coefficients.end();it1++)
+  vector<string> var_names(var_names_to_index.size());
+  for(map<string,int>::const_iterator it=var_names_to_index.begin();it!=var_names_to_index.end();it++)
     {
-      coefficients_tmp[pair<long,long>(it1->first.first+n,it1->first.second+m)]+=it1->second*coefficient;
+      if(it->second<0||it->second>=var_names_to_index.size())
+	{
+	  cerr<<"ERROR with variables in Polynomial."<<endl;
+	  exit(1);	  
+	}
+      var_names[it->second]=it->first;
     }
-  coefficients=coefficients_tmp;
-  clean();
+  return var_names;
 }
+////---------------------------------------------------------------------------
+bool Polynomial::load_from_string(string str,bool flag_keep_var_names)
+{
+  //NOTE:
+  //format: monom1 monom2 monom3 ...
+  //with monomi: coef*var_names[0]^exp1*var_names[1]^exp2*var_names[3]^exp3*... OR coef*var^exp OR coef
+  //and var: must start with alphabetic character, followed by alphanumeric characters
+  //and coef: sign integer OR integer OR sign
+  //and exp: sign integer OR integer OR  (sign integer) OR (integer)
+  //Examples (valid):
+  //"1"
+  //"0"
+  //"2+x^2+1*x^ 3*y+2*x^(4)*y^(-5)-3*x*y^4 -3*x^(2)+ x^(-2)"
+  //"x^ 3*y^(-4)-y^(-6)*x^2 + x^(-2)"
+  //Examples (errors):
+  //"x^(3+4)*y^(-4)  => error: (3+4)
+  //"x^(3)*3y^(-4)  => error: invalid variable name 3y
+
+
+
+  coefficients.clear();
+  map<string,int> var_names_to_index_tmp;
+  const boost::regex e1("[ \r]");
+  str= regex_replace(str, e1, "", boost::match_default);
+  //replace "^(...)" by "^..."
+  const boost::regex e2("\\^\\(([+-]*[0-9]+)\\)([+-]|$|\\*)");
+  str= regex_replace(str, e2, "\\^\\1\\2", boost::match_default);
+  //add a + in first position if not already a + or -
+  const boost::regex e3("^([^+-])");
+  str= regex_replace(str, e3, "+\\1", boost::match_default);
+
+  //check validity
+  std::string::const_iterator start, end;
+  std::string::const_iterator start2, end2;
+  start = str.begin();
+  end = str.end();
+  boost::match_results<std::string::const_iterator> m;
+  boost::match_flag_type flags = boost::match_default;
+  //search for invalid variable names (starting with numeric char)
+  const boost::regex invalidvar1("(?:^|[^a-zA-Z])([0-9]+[a-zA-Z]+[0-9a-zA-Z]*)");
+  if(regex_search(start,end, m,invalidvar1, flags))
+    {
+      return false;
+    }
+  //search for two consecutive -,+ or *
+  const boost::regex invalidvar2("([-\\+\\*][-\\+\\*])");
+  if(regex_search(start,end, m,invalidvar2, flags))
+    {
+      return false;
+    }
+
+  const boost::regex monomial("([+-])(?:([0-9]+)\\*?)?((?:[a-zA-Z]+[0-9a-zA-Z]*(?:\\^[+-]*[0-9]+)?)?(?:\\*[a-zA-Z]+[0-9a-zA-Z]*(?:\\^[+-]*[0-9]+)?)*)");
+  const boost::regex var("(?:^|\\*)(?:([a-zA-Z]+[0-9a-zA-Z]*)(?:\\^([+-]*)([0-9]+))?)");
+  boost::match_results<std::string::const_iterator> m2;
+  vector<vector<pair<string,long> > > monomials_products;//monomials_products[n]=vector((variable1,exponent1),(variable2,exponent2),...) 
+  vector<double> monomials_coefficients;//monomials_coeff[n]=signed coefficient for n-th monomial
+  string str_matched="";
+  //searc for monomials
+  while(true)
+    {
+      if(regex_search(start, end, m,monomial, flags)&&m[0].first==start)
+	{
+	  //m[1]=sign
+	  //m[2]=coef
+	  //m[3]=product
+	  if(m.size()!=4)
+	    {
+	      return false;
+	    }
+	  if(m[2]==""&&m[3]=="")
+	    {
+	      return false;
+	    }
+	  double coef=1;
+	  vector<pair<string,long> > product;
+	  if(m[2]!="")
+	    coef=atol(string(m[2].first,m[2].second).c_str());
+	  if(m[1]=="-")
+	    coef=-coef;
+	  //search with monomial
+	  start2=m[3].first;
+	  end2=m[3].second;
+	  string str_matched2="";
+	  while(true)
+	    {
+	      if(regex_search(start2,end2, m2,var, flags)&&m2[0].first==start2)
+		{
+		  //m2[1]=variable
+		  //m2[2]=exponent_sign
+		  //m2[3]=exponent
+		  string var=m2[1];
+		  long exp=1;
+		  if(m2[3]!="")
+		    exp=atol(string(m2[3].first,m2[3].second).c_str());
+		  if(m2[2]=="-")
+		    exp=-exp;
+		  product.push_back(pair<string,int>(var,exp));
+		  var_names_to_index_tmp[var]=-1;
+		  start2 = m2[0].second;		  
+		}
+	      else
+		{
+		  break;
+		}
+	      str_matched2=str_matched2+string(m2[0].first,m2[0].second);
+	    }
+	  if(str_matched2!=string(m[3].first,m[3].second))
+	    {
+	      return false;
+	    }
+	  start = m[0].second;
+	  monomials_coefficients.push_back(coef);
+	  monomials_products.push_back(product);
+	}
+      else
+	{
+	  break;
+	}
+      str_matched=str_matched+string(m[0].first,m[0].second);      
+    }
+  if(str_matched!=str)
+    {
+      return false;
+    }
+  //create var_names_to_index
+  if(flag_keep_var_names==false)//i.e. replace var_names_to_index
+    {
+      int index=0;
+      var_names_to_index=var_names_to_index_tmp;
+      for(map<string,int>::iterator it=var_names_to_index.begin();it!=var_names_to_index.end();it++)
+	{
+	  it->second=index;
+	  index++;
+	}
+    }
+  else//
+    {
+      //add all variable in var_names_to_index to var_names_to_index_tmp
+      int index=0;
+      for(map<string,int>::iterator it=var_names_to_index.begin();it!=var_names_to_index.end();it++)
+	{
+	  var_names_to_index_tmp[it->first]=0;
+	}
+      if(var_names_to_index_tmp.size()>var_names_to_index.size())// => var_names_to_index_tmp (i.e. input string) contain variables that are not in var_names_to_index
+	{	  
+	  return false;
+	}
+    }
+
+  //create coefficients
+  vector<long> exponents(var_names_to_index.size());
+  for(int n=0;n<monomials_coefficients.size();n++)
+    {
+      for(int i=0;i<exponents.size();i++)
+	exponents[i]=0;
+      for(int i=0;i<monomials_products[n].size();i++)
+	{
+	  int var_index=var_names_to_index[monomials_products[n][i].first];
+	  exponents[var_index]+=monomials_products[n][i].second;
+	}
+      coefficients[exponents]=monomials_coefficients[n];
+    }
+
+  return true;
+}
+
+//---------------------------------------------------------------------------
+string Polynomial::to_string()const
+{
+  stringstream ss;
+  ss<<*this;
+  return ss.str();
+}
+
+//---------------------------------------------------------------------------
+ostream& operator<<(ostream& out, const Polynomial& p)
+{
+  vector<string> var_names=p.get_variable_names();
+  if(p.coefficients.size()==0)
+    {
+      out<<"0";
+      return out;
+    }
+
+  for(map<vector<long>,double>::const_iterator it=p.coefficients.begin();it!=p.coefficients.end();it++)
+    {
+      //coefficient
+      long coef=it->second;
+      string s="*";
+      if(fabs(coef-1)<ZERO)
+	{
+	  out<<" + ";
+	  s="";
+	}
+      else if(fabs(coef+1)<ZERO)
+	{
+	  out<<" - ";
+	  s="";
+	}
+      else
+	{
+	  if(coef>0)
+	    out<<" + "<<coef;
+	  else
+	    out<<" - "<<fabs(coef);
+	  s="*";
+	}
+      //product
+      long exponent;
+      string var;
+      bool flag_all_zero=true;
+      for(int i=0;i<it->first.size();i++)
+	{
+	  exponent=it->first[i];
+	  var=var_names[i];
+	  if(exponent==1)
+	    {
+	      out<<s<<var;
+	      s="*";
+	      flag_all_zero=false;
+	    }
+	  else if(exponent!=0)
+	    {
+	      out<<s<<var<<"^("<<exponent<<")";
+	      s="*";
+	      flag_all_zero=false;
+	    }
+	}
+      if(flag_all_zero)
+	{
+	  if(s=="")//i.e. coefficient not yet written
+	    out<<s<<1;
+	  s="*";
+	}
+    }
+  return out;
+}
+
+//---------------------------------------------------------------------------
+
+bool Polynomial::operator==(const Polynomial &p)const
+{
+  
+  if(var_names_to_index==p.var_names_to_index)
+    {
+      return coefficients==p.coefficients;
+    }
+  else
+    {
+      return to_string()==p.to_string();
+    }
+
+}
+
 
 //---------------------------------------------------------------------------
 void Polynomial::clean()
 {
-  map<pair<long,long>,double>::iterator it=coefficients.begin();
+  map<vector<long>,double>::iterator it=coefficients.begin();
   while(it!=coefficients.end())
     {
       if(fabs(it->second)<ZERO)
@@ -87,246 +421,44 @@ void Polynomial::clean()
 	}
     }
 }
-
-////---------------------------------------------------------------------------
-bool Polynomial::load_from_string(string str,string var1_name_t,string var2_name_t)
+//---------------------------------------------------------------------------
+int Polynomial::add_variable(string var_name)
 {
-  //NOTE:
-  //format: monom1 monom2 monom3 ...
-  //with monomi: coef*var1^exp1*var2^exp2 OR coef*var*exp OR coef
-  //and var: only alphabetic chars
-  //and coef: sign integer OR integer
-  //and exp: sign integer OR integer OR  (sign integer) OR (integer)
-  //Examples (valid):
-  //"1"
-  //"0"
-  //"2+x^2+1*x^ 3*y+2*x^(4)*y^(-5)-3*x*y^4 -3*x^(2)+ x^(-2)"
-  //"x^ 3*y^(-4)-y^(-6)*x^2 + x^(-2)"
-  //Exapmles (errors):
-  //"x^(3+4)*y^(-4)  => error: (3+4)
-  //"A+1-y^(-6)*x^2 + V^(-2)"  => error: 4 variable A,x,y,V
+  vector<int> old_to_new_index(var_names_to_index.size());//old_to_new_index[m]=n <=> var_name_to_index[var]=n after insertion correspond to var_names_to_index[var]=m before insertion
 
-  coefficients.clear();
-  var1_name=var1_name_t;
-  var2_name=var2_name_t;
-  //remove " ", "\r"
-  const boost::regex e1("[ \r]");
-  str= regex_replace(str, e1, "", boost::match_default);
-  //replace "^(...)" by "^..."
-  const boost::regex e2("\\^\\(([+-]*[0-9]+)\\)([+-]|$|\\*)");
-  str= regex_replace(str, e2, "\\^\\1\\2", boost::match_default);
-  //add a + in first position if not already a + or -
-  const boost::regex e3("^([^+-])");
-  str= regex_replace(str, e3, "+\\1", boost::match_default);
-  if(str=="")
+  int new_index=-1;
+  //insert new variable  
+  var_names_to_index[var_name]=-1;  
+  //recreate var_names and adapt index
+  int index=0;
+  for(map<string,int>::iterator it=var_names_to_index.begin();it!=var_names_to_index.end();it++)
     {
-      //cerr<<"ERROR Polynomial::load_from_string(): empty string"<<endl;
-      coefficients.clear();
-      var1_name=var1_name_t;
-      var2_name=var2_name_t;
-      return false;
-    }
-	
-  
-  //find monomial
-  const boost::regex monomial1("([+-])(?:([0-9]+)\\*)?([a-zA-Z]+)(?:\\^([+-]*)([0-9]+))?\\*([a-zA-Z]+)(?:\\^([+-]*)([0-9]+))?");// +1*x^2*y^3 or -1*x*y
-  const boost::regex monomial2("([+-])(?:([0-9]+)\\*)?([a-zA-Z]+)(?:\\^([+-]*)([0-9]+))?");// +1*x^2 or -1*y
-  const boost::regex monomial3("([+-])([0-9]+)");// +1
-  std::string::const_iterator start, end;
-  start = str.begin();
-  end = str.end();
-  boost::match_results<std::string::const_iterator> m;
-  boost::match_flag_type flags = boost::match_default;
-  long coef,exp1,exp2;
-  string var1,var2;
-  string str_matched="";
-  while(true)
-    {
-      if(regex_search(start, end, m,monomial1, flags)&&m[0].first==start)
+      if(it->first==var_name)
 	{
-	  if(m.size()!=9)
-	    {
-	      coefficients.clear();
-	      var1_name=var1_name_t;
-	      var2_name=var2_name_t;
-	      return false;
-	    }
-	  coef=1;
-	  if(m[2]!="")
-	    coef=atol(string(m[2].first,m[2].second).c_str());
-	  if(m[1]=="-")
-	    coef=-coef;
-	  exp1=1;
-	  if(m[5]!="")
-	    exp1=atol(string(m[5].first,m[5].second).c_str());
-	  if(m[4]=="-")
-	    exp1=-exp1;
-	  exp2=1;
-	  if(m[8]!="")
-	    exp2=atol(string(m[8].first,m[8].second).c_str());
-	  if(m[7]=="-")
-	    exp2=-exp2;
-	  var1=m[3];
-	  var2=m[6];
-	  start = m[0].second;
-
-	  if((var1==var1_name||var1_name=="")&&(var2==var2_name||var2_name==""))
-	    {
-	      var1_name=var1;
-	      var2_name=var2;
-	      add_monomial(coef,exp1,exp2);
-	    }
-	  else if((var2==var1_name||var1_name=="")&&(var1==var2_name||var2_name==""))
-	    {
-	      var1_name=var2;
-	      var2_name=var1;
-	      add_monomial(coef,exp2,exp1);
-	    }
-	  else
-	    {
-	      coefficients.clear();
-	      var1_name=var1_name_t;
-	      var2_name=var2_name_t;
-	      return false;
-	    }
-	    
-	}
-      else if(regex_search(start, end, m,monomial2, flags)&&m[0].first==start)
-	{
-	  coef=1;
-	  if(m[2]!="")
-	    coef=atol(string(m[2].first,m[2].second).c_str());
-	  if(m[1]=="-")
-	    coef=-coef;
-	  exp1=1;
-	  if(m[5]!="")
-	    exp1=atol(string(m[5].first,m[5].second).c_str());
-	  if(m[4]=="-")
-	    exp1=-exp1;
-	  var1=m[3];
-	  exp2=0;
-	  var2="";
-	  start = m[0].second;
-
-	  if(var1==var1_name||var1_name=="")
-	    {
-	      var1_name=var1;
-	      add_monomial(coef,exp1,exp2);
-	    }
-	  else if(var1==var2_name||var2_name=="")
-	    {
-	      var2_name=var1;
-	      add_monomial(coef,exp2,exp1);
-	    }
-	  else
-	    {
-	      coefficients.clear();
-	      var1_name=var1_name_t;
-	      var2_name=var2_name_t;
-	      return false;
-	    }	   
-	}
-      else if(regex_search(start, end, m,monomial3, flags)&&m[0].first==start)
-	{
-	  coef=1;
-	  if(m[2]!="")
-	    coef=atol(string(m[2].first,m[2].second).c_str());
-	  if(m[1]=="-")
-	    coef=-coef;
-	  exp1=0;
-	  var1="";
-	  exp2=0;
-	  var2="";
-	  start = m[0].second;
-	  
-	  add_monomial(coef,exp2,exp1);
+	  new_index=index;
 	}
       else
 	{
-	  break;
+	  old_to_new_index[it->second]=index;
 	}
-      str_matched=str_matched+string(m[0].first,m[0].second);
-      
+      it->second=index;
+      index++;
     }
-  if(str_matched!=str)
+  
+  //recreate coefficient
+  map<vector<long>,double> coefficients_new;
+  vector<long> expnew(var_names_to_index.size(),0);
+  for(map<vector<long>,double>::iterator it=coefficients.begin();it!=coefficients.end();it++)
     {
-      coefficients.clear();
-      var1_name=var1_name_t;
-      var2_name=var2_name_t;
-      return false;
-    }
-	
-  return true;
-}
-
-//---------------------------------------------------------------------------
-string Polynomial::to_string()
-{
-  stringstream ss;
-  ss<<*this;
-  return ss.str();
-}
-
-//---------------------------------------------------------------------------
-ostream& operator<<(ostream& out, const Polynomial& p)
-{
-  if(p.coefficients.size()==0)
-    out<<"0";
-  else
-    {
-      for(map<pair<long,long>,double>::const_iterator it=p.coefficients.begin();it!=p.coefficients.end();it++)
+      for(int i=0;i<it->first.size();i++)
 	{
-	  string s="*";
-	  if(fabs(it->second-1)<ZERO)
-	    {
-		out<<" + ";
-		s="";
-	    }
-	  else if(fabs(it->second+1)<ZERO)
-	    {
-		out<<" - ";
-		s="";
-	    }
-	  else
-	    {
-	      if(it->second>0)
-		out<<" + "<<it->second;
-	      else
-		out<<" - "<<fabs(it->second);
-	      s="*";
-	    }
-	  if(it->first.first==0&&it->first.second==0)
-	    {
-	      if(s=="")//i.e. coefficient not yet written
-		out<<s<<1;
-	      s="*";
-	    }	  
-	  else
-	    {
-	      if(it->first.first==1)
-		{
-		  out<<s<<p.var1_name;
-		  s="*";
-		}
-	      else if(it->first.first!=0)
-		{
-		  out<<s<<p.var1_name<<"^("<<it->first.first<<")";
-		  s="*";
-		}
-	      if(it->first.second==1)
-		{
-		  out<<s<<p.var2_name;
-		  s="*";
-		}
-	      else if(it->first.second!=0)
-		{
-		  out<<s<<p.var2_name<<"^("<<it->first.second<<")";
-		  s="*";
-		}
-	    }
+	  expnew[old_to_new_index[i]]=it->first[i];
+	  coefficients_new[expnew]=it->second;
 	}
-    } 
+    }
+  
+  coefficients=coefficients_new;
 
-  return out;
+  return new_index;
 }
 

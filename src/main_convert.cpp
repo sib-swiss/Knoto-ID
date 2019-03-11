@@ -298,8 +298,9 @@ int main(int argc, char **argv)
       cout<<"If you use this software for a publication, please cite:"<<endl;
       cout<<"J. Dorier, D. Goundaroulis, F. Benedetti and A. Stasiak, \"Knoto-ID: a tool to study the entanglement of open protein chains using the concept of knotoids\", Bioinformatics 34, 3402-3404 (2018)."<<endl;
       cout<<endl;
-      cout<<"If you use the knotoid classification given in files"<<endl;
-      cout<<"examples/knotoid_names_sphere.txt or examples/knotoid_names_planar.txt,"<<endl;
+      cout<<"If you use the knotoid classification from the internal database (with --names-db=internal)"<<endl;
+      cout<<"or from files examples/knotoid_names_sphere.txt, examples/knotoid_names_planar.txt,"<<endl;
+      cout<<"examples/knotoid_names_sphere_arrow.txt or examples/knotoid_names_planar_arrow.txt"<<endl;
       cout<<"please cite:"<<endl;
       cout<<"D. Goundaroulis, J. Dorier and A. Stasiak, \"A systematic classification of knotoids on the plane and on the sphere\", arXiv:1902.07277 [math.GT]"<<endl;
       cout<<endl;

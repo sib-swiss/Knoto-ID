@@ -1,2 +1,1 @@
-#frequency	knot_type	polynomial
-1	3_1R	 - A^(-16) + A^(-12) + A^(-4)
+Knot type: 5_2L|11n_57R|12n_0475R	Polynomial:  + A^(4) - A^(8) + 2*A^(12) - A^(16) + A^(20) - A^(24)
