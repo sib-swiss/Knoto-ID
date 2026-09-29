@@ -1,6 +1,12 @@
 Knoto-ID
 ========
 
+> **Maintenance Notice — September 2026**
+>
+> This repository is no longer actively maintained.
+>
+> Development has moved to <https://github.com/dgound/Knoto-ID>, where Dimos Goundaroulis continues the project.
+
 The backbone of most proteins forms an open curve.  To study their
 entanglement, a common strategy consists in searching for the presence
 of knots in their backbones using topological invariants.  However,
